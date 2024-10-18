@@ -63,7 +63,7 @@ const Profile = () => {
 
     const handleDeleteUser = async (userId: string) => {
         try {
-            await axios.delete(`/api/user/${userId}`);
+            await axios.delete(`/api/user/profile/${userId}`);
             alert('User deleted');
         } catch (error) {
             console.error('failed to delete user', error);
