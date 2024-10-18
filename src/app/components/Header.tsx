@@ -16,9 +16,6 @@ const Header = () => {
             const token = localStorage.getItem('token');
             const userIsAdmin = localStorage.getItem('isAdmin') === 'true';
 
-            console.log('Token in Header:', token);  // Felsökning: Se om token finns
-            console.log('isAdmin from localStorage in Header:', userIsAdmin);  // Felsökning: Se om isAdmin är true
-
             setIsLoggedIn(!!token);
             setIsAdmin(userIsAdmin);
         };
@@ -44,6 +41,11 @@ const Header = () => {
         setDropdownOpen(!dropdownOpen);
     };
 
+    // Stäng dropdown när man klickar på en länk
+    const closeDropdown = () => {
+        setDropdownOpen(false);
+    };
+
     return (
         <header className="bg-gray-800 text-white p-4">
             <nav className="container mx-auto flex justify-between items-center">
@@ -58,11 +60,11 @@ const Header = () => {
                             </button>
                             {dropdownOpen && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
-                                    <Link href="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Profil</Link>
+                                    <Link href="/profile" onClick={closeDropdown} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Profil</Link>
                                     {isAdmin && (
-                                        <Link href="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Admin Panel</Link>
+                                        <Link href="/admin" onClick={closeDropdown} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Admin Panel</Link>
                                     )}
-                                    <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Logga ut</button>
+                                    <button onClick={() => { handleLogout(); closeDropdown(); }} className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Logga ut</button>
                                 </div>
                             )}
                         </div>

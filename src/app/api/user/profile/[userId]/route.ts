@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, { params }: { params: { userId: string } }) {
     const authorizationHeader = req.headers.get('authorization');
 
+    // Kontrollera att Authorization-headern finns
     if (!authorizationHeader) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
@@ -14,19 +15,28 @@ export async function GET(req: NextRequest) {
     const token = authorizationHeader.split(' ')[1];
 
     try {
-        const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET!);
-        const userId = decodedToken.userId; // Justera om du använder 'UserId' istället
+        // Verifiera JWT-token
+        jwt.verify(token, process.env.JWT_SECRET!);
 
+        // Kontrollera att userId skickas korrekt från URL-parametrarna
+        const { userId } = params;
+        if (!userId || userId === 'null') {
+            return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
+        }
+
+        // Hämta användarens profil baserat på userId
         const user = await prisma.user.findUnique({
             where: {
                 id: userId,
             },
         });
 
+        // Kontrollera om användaren finns
         if (!user) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 });
         }
 
+        // Returnera användardata
         return NextResponse.json({
             id: user.id,
             name: user.name,
@@ -40,5 +50,5 @@ export async function GET(req: NextRequest) {
 }
 
 export const config = {
-    runtime: 'nodejs',
+    runtime: 'nodejs', // Om du behöver specificera runtime
 };
