@@ -1,101 +1,127 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import axios from "axios";
+import { useParams, useRouter } from 'next/navigation'; // Använd useParams istället för useRouter
+import axios from 'axios';
 
 const Profile = () => {
+    const { userId } = useParams(); // Hämta användarens ID från URL:en
+    const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [userData, setUserData] = useState<any>(null);
-    const [showSettings, setShowSettings] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
     const router = useRouter();
-    const { userId } = useParams();  // Hämta userId från URL:en
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            router.push('/login');
-        } else {
-            const userIsAdmin = localStorage.getItem('isAdmin') === 'true';
-            setIsAdmin(userIsAdmin);
 
-            const fetchUserData = async () => {
+        const adminStatus = localStorage.getItem('isAdmin') === 'true';
+        setIsAdmin(adminStatus);
+
+        if (userId) {
+            const fetchUser = async () => {
                 try {
+                    const token = localStorage.getItem("token");
+                    if (!token) return;
+
                     const response = await axios.get(`/api/user/profile/${userId}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        }
+                        headers: { Authorization: `Bearer ${token}` },
                     });
-                    setUserData(response.data);
+
+                    setUser(response.data);
                 } catch (error) {
-                    console.error('Failed to fetch userData', error);
+                    console.error("Misslyckades med att hämta användarens profil", error);
                 }
             };
 
-            if (userId) {
-                fetchUserData();  // Hämta endast data om userId finns
-            }
+            fetchUser();
         }
-    }, [userId, router]);
+    }, [userId]);
+
+    if (!user) return <p>Laddar profil...</p>;
 
     const handleDeleteAccount = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) return;
 
-            await axios.delete("/api/admin/delete", {
+            await axios.delete(`/api/admin/delete/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            localStorage.removeItem('token');
-            localStorage.removeItem('isAdmin');
-            router.push('/login');
+            // egna konto
+            if (userId === localStorage.getItem('userId')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('isAdmin');
+                localStorage.removeItem('userId');
+                router.push('/login');
+            } else {
+                router.push('/admin');
+            }
         } catch (error) {
-            console.error('Failed to delete account', error);
+            console.error('Misslyckades med att radera användare', error);
         }
     };
 
-    const toggleSettings = () => {
-        setShowSettings(!showSettings);  // Växla visningen av inställningar
+    const handleUpgradeToAdmin = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            await axios.post(`/api/admin/upgrade/${userId}`, null, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            alert('Användaren uppgraderades till admin');
+            window.location.reload();
+        } catch (error) {
+            console.error('Misslyckades med att uppgradera användaren', error);
+        }
+    };
+
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
     };
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-xl font-bold">Welcome to your profile!</h1>
-            {userData && (
-                <div>
-                    <p className="text-lg">Name: {userData.name}</p>
-                    <p className="text-lg">Email: {userData.email}</p>
-                </div>
-            )}
+        <div>
+            <h1>{user.name}s Profil</h1>
+            <p>Email: {user.email}</p>
+            <p>Adminstatus: {user.isAdmin ? 'Ja' : 'Nej'}</p>
 
-            <div className="mt-4">
-                <button onClick={toggleSettings} className="text-gray-800">
-                    <i className="fas fa-cog text-2xl cursor-pointer"></i>
+            {/* Inställningsikon */}
+            <div className="relative">
+                <button onClick={toggleDropdown} className="focus:outline-none">
+                    <i className="fas fa-cog text-2xl"></i> {/* Inställningsikon */}
                 </button>
-            </div>
 
-            {showSettings && (
-                <div className="mt-4">
-                    {!isAdmin ? (
-                        <div>
-                            <h2 className="text-lg font-semibold">User Settings</h2>
-                            <button onClick={handleDeleteAccount} className="px-4 py-2 bg-red-500 text-white rounded">
-                                Delete Account
+                {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
+                        {/* Alternativ för administratörer */}
+                        {isAdmin && (
+                            <>
+                                {!user.isAdmin && (
+                                    <button onClick={handleUpgradeToAdmin} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                                        Uppgradera till admin
+                                    </button>
+                                )}
+                                <button onClick={handleDeleteAccount} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                                    Radera konto (som admin)
+                                </button>
+                            </>
+                        )}
+
+                        {/* Alternativ för icke-admin (radera sitt eget konto) */}
+                        {!isAdmin && userId === localStorage.getItem('userId') && (
+                            <button onClick={handleDeleteAccount} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                                Radera mitt konto
                             </button>
-                        </div>
-                    ) : (
-                        <div>
-                            <h2 className="text-lg font-semibold">Admin Settings</h2>
-                            <button className="px-4 py-2 bg-blue-500 text-white rounded">
-                                Admin-specific Action
-                            </button>
-                        </div>
-                    )}
-                </div>
-            )}
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
 
 export default Profile;
+

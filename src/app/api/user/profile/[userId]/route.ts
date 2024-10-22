@@ -44,6 +44,13 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
             isAdmin: user.isAdmin,
         }, { status: 200 });
     } catch (error) {
+        // Specifik hantering av JWT-fel
+        if (error instanceof jwt.JsonWebTokenError) {
+            return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+        } else if (error instanceof jwt.TokenExpiredError) {
+            return NextResponse.json({ message: 'Token expired' }, { status: 401 });
+        }
+
         console.error('Failed to fetch user', error);
         return NextResponse.json({ message: 'Failed to fetch user' }, { status: 500 });
     }

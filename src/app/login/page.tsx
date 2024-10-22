@@ -34,9 +34,12 @@ const Login = () => {
                 const isAdmin = decodedToken.isAdmin;
                 console.log('isAdmin:', isAdmin);  // Kontrollera om isAdmin är true
 
+                const userId = decodedToken.userId;
+
                 // Spara token och admin-status i localStorage
                 localStorage.setItem('token', token);
                 localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
+                localStorage.setItem('userId', userId);
 
                 window.dispatchEvent(new Event('login'));  // Trigga login-event
                 router.push('/');

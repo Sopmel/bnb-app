@@ -11,6 +11,7 @@ const AdminPage = () => {
     const [searchTerm, setSearchTerm] = useState(''); // Hanterar sökfältets värde
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [showUsers, setShowUsers] = useState(false); // Ny state för att visa/hide användarlistan
 
     // Kontrollera om användaren är admin
     useEffect(() => {
@@ -45,44 +46,6 @@ const AdminPage = () => {
         fetchUsers();
     }, []);
 
-    // Uppgradera en användare till admin
-    const handleUpgradeToAdmin = async (userId: string) => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) return;
-
-            await axios.post("/api/admin/upgrade", { userId }, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            setSuccess("Användaren uppgraderades till admin.");
-            setUsers(users.map(user => user.id === userId ? { ...user, isAdmin: true } : user));
-            setFilteredUsers(filteredUsers.map(user => user.id === userId ? { ...user, isAdmin: true } : user));
-        } catch (error) {
-            console.error("Misslyckades med att uppgradera användaren", error);
-            setError("Misslyckades med att uppgradera användaren.");
-        }
-    };
-
-    // Radera en användare
-    const handleDeleteUser = async (userId: string) => {
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) return;
-
-            await axios.delete(`/api/admin/delete/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            setSuccess("Användaren raderades.");
-            setUsers(users.filter(user => user.id !== userId));
-            setFilteredUsers(filteredUsers.filter(user => user.id !== userId));
-        } catch (error) {
-            console.error("Misslyckades med att radera användaren", error);
-            setError("Misslyckades med att radera användaren.");
-        }
-    };
-
     // Hantera ändring i sökfältet
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value.toLowerCase();
@@ -96,57 +59,92 @@ const AdminPage = () => {
         setFilteredUsers(filtered);
     };
 
+    const handleViewProfile = (userId: string) => {
+        router.push(`/profile/${userId}`);
+    };
+
     return (
         <div className="container">
-            <h1>Admin Panel - Hantera användare</h1>
+            <h1>Admin Panel</h1>
 
             {error && <p className="text-red-500">{error}</p>}
             {success && <p className="text-green-500">{success}</p>}
 
-            {/* Sökfält */}
+            {/* Sökfält visas alltid */}
             <input
                 type="text"
-                placeholder="Sök på namn eller e-post"
+                placeholder="search users"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="border p-2 w-full mb-4"
             />
 
-            <table className="min-w-full table-auto mt-4">
-                <thead>
-                    <tr>
-                        <th>Namn</th>
-                        <th>E-post</th>
-                        <th>Adminstatus</th>
-                        <th>Handlingar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredUsers.map(user => (
-                        <tr key={user.id}>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.isAdmin ? "Admin" : "Användare"}</td>
-                            <td>
-                                {!user.isAdmin && (
-                                    <button
-                                        onClick={() => handleUpgradeToAdmin(user.id)}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
-                                    >
-                                        Uppgradera till admin
-                                    </button>
-                                )}
-                                <button
-                                    onClick={() => handleDeleteUser(user.id)}
-                                    className="bg-red-500 text-white px-4 py-2 rounded"
-                                >
-                                    Radera användare
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {/* Knapp för att visa användarlistan */}
+            <button
+                onClick={() => setShowUsers(!showUsers)} // Växla visning
+                className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+            >
+                {showUsers ? 'Hide all users' : 'Show all users'}
+            </button>
+
+            {/* Visa sökresultat separat (Sökresultatslistan) */}
+            {searchTerm && (
+                <div style={{ backgroundColor: '#d4edda', padding: '1rem', borderRadius: '8px' }}>
+                    <h2>Sökresultat</h2>
+                    <table className="min-w-full table-auto mt-4">
+                        <thead>
+                            <tr>
+                                <th>Namn</th>
+                                <th>E-post</th>
+                                <th>Adminstatus</th>
+                                <th>Handlingar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredUsers.map(user => (
+                                <tr key={user.id}>
+                                    <td>{user.name}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.isAdmin ? "Admin" : "Användare"}</td>
+                                    <td>
+                                        <button onClick={() => handleViewProfile(user.id)}
+                                            className="px-4 py-2 rounded"> Visa Profil </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            {/* Visa alla användare (Show All Users-listan) */}
+            {showUsers && (
+                <div>
+                    <table className="min-w-full table-auto mt-4">
+                        <thead>
+                            <tr>
+                                <th>Namn</th>
+                                <th>E-post</th>
+                                <th>Adminstatus</th>
+                                <th>Handlingar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map(user => (
+                                <tr key={user.id}>
+                                    <td>{user.name}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.isAdmin ? "Admin" : "Användare"}</td>
+                                    <td>
+                                        <button onClick={() => handleViewProfile(user.id)}
+                                            className="px-4 py-2 rounded"> Visa Profil </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };
