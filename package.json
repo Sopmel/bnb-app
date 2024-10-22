@@ -9,7 +9,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@prisma/client": "^5.21.0",
+    "@prisma/client": "^5.21.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.7.5",
@@ -19,13 +19,13 @@
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "next": "^14.2.15",
-    "prisma": "^5.21.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
+    "prisma": "^5.21.1",
     "tailwindcss": "^3.4.14",
     "typescript": "5.6.3"
   }

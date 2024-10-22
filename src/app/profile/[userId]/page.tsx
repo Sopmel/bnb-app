@@ -1,8 +1,10 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
+
+import PropertyPage from '../../components/PropertyPage';
 
 const Profile = () => {
     const { userId } = useParams(); // Hämta ID från URL
@@ -36,7 +38,7 @@ const Profile = () => {
         }
     }, [userId]);
 
-    if (!user) return <p>Loading profil...</p>;
+    if (!user) return <p>Loading profile...</p>;
 
     const handleDeleteAccount = async () => {
         try {
@@ -84,18 +86,35 @@ const Profile = () => {
     };
 
     return (
-        <div>
-            <h1>{user.name}</h1>
-            <p>Email: {user.email}</p>
-            <p>Adminstatus: {user.isAdmin ? 'Admin' : 'Not Admin'}</p>
+        <div style={{ maxWidth: '900px', margin: 'auto', padding: '20px' }}>
+            {/* Profile Information */}
+            <div style={{
+                padding: '20px',
+                border: '1px solid #ccc',
+                borderRadius: '10px',
+                backgroundColor: '#f9f9f9',
+                marginBottom: '20px',
+                position: 'relative',
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '10px' }}>{user.name}'s Profile</h1>
 
-            <div className="relative">
-                <button onClick={toggleDropdown} className="focus:outline-none">
-                    <i className="fas fa-cog text-2xl"></i> {/* Inställningsikon */}
-                </button>
+                    {/* Settings Button - Positioned at top-left inside the profile section */}
+                    <button onClick={toggleDropdown} className="focus:outline-none" style={{
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        padding: '10px 15px',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        alignSelf: 'flex-start' // Makes the button align at the top left
+                    }}>
+                        Settings <i className="fas fa-cog"></i>
+                    </button>
+                </div>
 
                 {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
+                    <div className="absolute mt-2 w-48 bg-white rounded-md shadow-lg">
                         {isAdmin && (
                             <>
                                 <button
@@ -117,6 +136,19 @@ const Profile = () => {
                         )}
                     </div>
                 )}
+
+                <p><strong>Email:</strong> {user.email}</p>
+                <p><strong>Admin status:</strong> {user.isAdmin ? 'Admin' : 'Not Admin'}</p>
+            </div>
+
+            {/* Property Section */}
+            <div style={{
+                padding: '20px',
+                border: '1px solid #ccc',
+                borderRadius: '10px',
+                backgroundColor: '#fff',
+            }}>
+                <PropertyPage />
             </div>
         </div>
     );
