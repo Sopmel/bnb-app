@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import axios from 'axios';
@@ -28,11 +28,9 @@ const Login = () => {
 
                 // Dekodera JWT-token
                 const decodedToken: any = decodeJWT(token);
-                console.log('Decoded token:', decodedToken);  // Logga ut token för felsökning
 
                 // Hämta isAdmin från den dekoderade tokenen
                 const isAdmin = decodedToken.isAdmin;
-                console.log('isAdmin:', isAdmin);  // Kontrollera om isAdmin är true
 
                 const userId = decodedToken.userId;
 
@@ -51,30 +49,41 @@ const Login = () => {
     };
 
     return (
-        <div className="container">
-            <h1>Logga in</h1>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>E-post</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Lösenord</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                {error && <p>{error}</p>}
-                <button type="submit">Logga in</button>
-            </form>
+        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+                <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Logga in</h1>
+                {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                <form onSubmit={handleLogin} className="space-y-6">
+                    <div>
+                        <label className="block text-gray-700 mb-2">E-post</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Ange din e-post"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700 mb-2">Lösenord</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Ange ditt lösenord"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                        Logga in
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

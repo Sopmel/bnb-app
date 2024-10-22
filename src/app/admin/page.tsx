@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -64,51 +64,57 @@ const AdminPage = () => {
     };
 
     return (
-        <div className="container">
-            <h1>Admin Panel</h1>
+        <div className="container mx-auto p-6 bg-gray-100 rounded-lg shadow-md">
+            <h1 className="text-3xl font-bold mb-6 text-center">Admin Panel</h1>
 
-            {error && <p className="text-red-500">{error}</p>}
-            {success && <p className="text-green-500">{success}</p>}
+            {error && <p className="text-red-500 mb-4">{error}</p>}
+            {success && <p className="text-green-500 mb-4">{success}</p>}
 
             {/* Sökfält visas alltid */}
-            <input
-                type="text"
-                placeholder="search users"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="border p-2 w-full mb-4"
-            />
+            <div className="flex justify-center mb-6">
+                <input
+                    type="text"
+                    placeholder="Search users"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className="border p-2 w-1/2 rounded-lg"
+                />
+            </div>
 
             {/* Knapp för att visa användarlistan */}
-            <button
-                onClick={() => setShowUsers(!showUsers)} // Växla visning
-                className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-            >
-                {showUsers ? 'Hide all users' : 'Show all users'}
-            </button>
+            <div className="text-center mb-6">
+                <button
+                    onClick={() => setShowUsers(!showUsers)} // Växla visning
+                    className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-600 transition"
+                >
+                    {showUsers ? 'Hide all users' : 'Show all users'}
+                </button>
+            </div>
 
             {/* Visa sökresultat separat (Sökresultatslistan) */}
             {searchTerm && (
-                <div style={{ backgroundColor: '#d4edda', padding: '1rem', borderRadius: '8px' }}>
-                    <h2>Sökresultat</h2>
-                    <table className="min-w-full table-auto mt-4">
-                        <thead>
+                <div className="bg-green-100 p-4 rounded-lg mb-6 shadow-md">
+                    <h2 className="text-xl font-semibold mb-4">Search Results</h2>
+                    <table className="min-w-full table-auto bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead className="bg-green-200">
                             <tr>
-                                <th>Namn</th>
-                                <th>E-post</th>
-                                <th>Adminstatus</th>
-                                <th>Handlingar</th>
+                                <th className="px-4 py-2">Name</th>
+                                <th className="px-4 py-2">Email</th>
+                                <th className="px-4 py-2">Admin Status</th>
+                                <th className="px-4 py-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredUsers.map(user => (
-                                <tr key={user.id}>
-                                    <td>{user.name}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.isAdmin ? "Admin" : "Användare"}</td>
-                                    <td>
+                                <tr key={user.id} className="border-b">
+                                    <td className="px-4 py-2">{user.name}</td>
+                                    <td className="px-4 py-2">{user.email}</td>
+                                    <td className="px-4 py-2">{user.isAdmin ? "Admin" : "User"}</td>
+                                    <td className="px-4 py-2">
                                         <button onClick={() => handleViewProfile(user.id)}
-                                            className="px-4 py-2 rounded"> Visa Profil </button>
+                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                            View Profile
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -119,25 +125,28 @@ const AdminPage = () => {
 
             {/* Visa alla användare (Show All Users-listan) */}
             {showUsers && (
-                <div>
-                    <table className="min-w-full table-auto mt-4">
-                        <thead>
+                <div className="bg-white p-4 rounded-lg shadow-md">
+                    <h2 className="text-xl font-semibold mb-4">All Users</h2>
+                    <table className="min-w-full table-auto bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead className="bg-gray-200">
                             <tr>
-                                <th>Namn</th>
-                                <th>E-post</th>
-                                <th>Adminstatus</th>
-                                <th>Handlingar</th>
+                                <th className="px-4 py-2">Name</th>
+                                <th className="px-4 py-2">Email</th>
+                                <th className="px-4 py-2">Admin Status</th>
+                                <th className="px-4 py-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {users.map(user => (
-                                <tr key={user.id}>
-                                    <td>{user.name}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.isAdmin ? "Admin" : "Användare"}</td>
-                                    <td>
+                                <tr key={user.id} className="border-b">
+                                    <td className="px-4 py-2">{user.name}</td>
+                                    <td className="px-4 py-2">{user.email}</td>
+                                    <td className="px-4 py-2">{user.isAdmin ? "Admin" : "User"}</td>
+                                    <td className="px-4 py-2">
                                         <button onClick={() => handleViewProfile(user.id)}
-                                            className="px-4 py-2 rounded"> Visa Profil </button>
+                                            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                            View Profile
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

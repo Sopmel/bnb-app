@@ -71,7 +71,7 @@ const Header = () => {
                                 <i className="fas fa-user-circle text-3xl"></i> {/* Använd en ikon */}
                             </button>
                             {dropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
+                                <div style={{ zIndex: 10 }} className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
                                     {/* Dynamisk länk till användarens profil */}
                                     {userId ? (
                                         <Link href={`/profile/${userId}`} onClick={closeDropdown} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
