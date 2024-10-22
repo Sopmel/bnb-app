@@ -62,7 +62,7 @@ const Header = () => {
         <header className="bg-gray-800 text-white p-4">
             <nav className="container mx-auto flex justify-between items-center">
                 <div>
-                    <Link href="/">Bnb App</Link>
+                    <Link href="/">Airbnb</Link>
                 </div>
                 <div>
                     {isLoggedIn ? (

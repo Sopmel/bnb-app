@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation'; // Använd useParams istället för useRouter
+import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 
 const Profile = () => {
-    const { userId } = useParams(); // Hämta användarens ID från URL:en
+    const { userId } = useParams(); // Hämta ID från URL
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -13,7 +13,6 @@ const Profile = () => {
     const router = useRouter();
 
     useEffect(() => {
-
         const adminStatus = localStorage.getItem('isAdmin') === 'true';
         setIsAdmin(adminStatus);
 
@@ -29,7 +28,7 @@ const Profile = () => {
 
                     setUser(response.data);
                 } catch (error) {
-                    console.error("Misslyckades med att hämta användarens profil", error);
+                    console.error("Failed to load user profile", error);
                 }
             };
 
@@ -37,7 +36,7 @@ const Profile = () => {
         }
     }, [userId]);
 
-    if (!user) return <p>Laddar profil...</p>;
+    if (!user) return <p>Loading profil...</p>;
 
     const handleDeleteAccount = async () => {
         try {
@@ -58,23 +57,25 @@ const Profile = () => {
                 router.push('/admin');
             }
         } catch (error) {
-            console.error('Misslyckades med att radera användare', error);
+            console.error('Failed to delete User', error);
         }
     };
 
-    const handleUpgradeToAdmin = async () => {
+    const handleToggleAdminStatus = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) return;
 
-            await axios.post(`/api/admin/upgrade/${userId}`, null, {
+            const action = user.isAdmin ? 'downgrade' : 'upgrade'; // Bestäm action baserat på status
+            await axios.post(`/api/admin/upgrade/${userId}`, { action }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            alert('Användaren uppgraderades till admin');
+            const message = user.isAdmin ? 'User downgraded to regular user' : 'User upgraded to Admin';
+            alert(message);
             window.location.reload();
         } catch (error) {
-            console.error('Misslyckades med att uppgradera användaren', error);
+            console.error('Failed to toggle user admin status', error);
         }
     };
 
@@ -84,11 +85,10 @@ const Profile = () => {
 
     return (
         <div>
-            <h1>{user.name}s Profil</h1>
+            <h1>{user.name}</h1>
             <p>Email: {user.email}</p>
-            <p>Adminstatus: {user.isAdmin ? 'Ja' : 'Nej'}</p>
+            <p>Adminstatus: {user.isAdmin ? 'Admin' : 'Not Admin'}</p>
 
-            {/* Inställningsikon */}
             <div className="relative">
                 <button onClick={toggleDropdown} className="focus:outline-none">
                     <i className="fas fa-cog text-2xl"></i> {/* Inställningsikon */}
@@ -96,24 +96,23 @@ const Profile = () => {
 
                 {dropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg">
-                        {/* Alternativ för administratörer */}
                         {isAdmin && (
                             <>
-                                {!user.isAdmin && (
-                                    <button onClick={handleUpgradeToAdmin} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                                        Uppgradera till admin
-                                    </button>
-                                )}
+                                <button
+                                    onClick={handleToggleAdminStatus}
+                                    className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                                >
+                                    {user.isAdmin ? 'Downgrade to user' : 'Upgrade to admin'}
+                                </button>
                                 <button onClick={handleDeleteAccount} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                                    Radera konto (som admin)
+                                    Delete User
                                 </button>
                             </>
                         )}
 
-                        {/* Alternativ för icke-admin (radera sitt eget konto) */}
                         {!isAdmin && userId === localStorage.getItem('userId') && (
                             <button onClick={handleDeleteAccount} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                                Radera mitt konto
+                                Delete Account
                             </button>
                         )}
                     </div>
@@ -124,4 +123,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

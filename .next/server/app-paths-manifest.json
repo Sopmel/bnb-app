@@ -1,4 +1,8 @@
 {
+  "/page": "app/page.js",
   "/profile/[userId]/page": "app/profile/[userId]/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/admin/page": "app/admin/page.js",
+  "/api/admin/upgrade/[userId]/route": "app/api/admin/upgrade/[userId]/route.js",
+  "/api/user/profile/[userId]/route": "app/api/user/profile/[userId]/route.js",
+  "/api/admin/users/route": "app/api/admin/users/route.js"
 }

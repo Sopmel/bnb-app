@@ -11,23 +11,30 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
             return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
         }
 
-        // Uppdatera användarens isAdmin-status
+        const { action } = await req.json();
+
+        if (action !== 'downgrade' && action !== 'upgrade') {
+            return NextResponse.json({ message: 'Invalid action' }, { status: 400 });
+        }
+
+        // Uppdatera användarens isAdmin-status baserat på action
         await prisma.user.update({
             where: {
                 id: userId,
             },
             data: {
-                isAdmin: true,
+                isAdmin: action === 'upgrade', // True om upgrade, annars false
             },
         });
 
-        return NextResponse.json({ message: 'User upgraded to admin' }, { status: 200 });
+        const message = action === 'upgrade' ? 'User upgraded to Admin' : 'User downgraded to regular user';
+        return NextResponse.json({ message }, { status: 200 });
     } catch (error) {
-        console.error('Failed to upgrade user', error);
-        return NextResponse.json({ message: 'Failed to upgrade user' }, { status: 500 });
+        console.error('Failed to toggle user admin status', error);
+        return NextResponse.json({ message: 'Failed to toggle user admin status' }, { status: 500 });
     }
 }
 
 export const config = {
-    runtime: 'nodejs', // Om det behövs för server-miljöer
+    runtime: 'nodejs',
 };
