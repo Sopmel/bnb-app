@@ -13,12 +13,18 @@ const Profile = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [updateProperties, setUpdateProperties] = useState(false);
+    const [isLoggedinProfile, setIsLoggedinProfile] = useState(false);
 
     const router = useRouter();
 
     useEffect(() => {
         const adminStatus = localStorage.getItem('isAdmin') === 'true';
+        const currentUserId = localStorage.getItem('userId');
         setIsAdmin(adminStatus);
+
+        if (userId && currentUserId === userId) {
+            setIsLoggedinProfile(true);
+        }
 
         if (userId) {
             const fetchUser = async () => {
@@ -155,7 +161,7 @@ const Profile = () => {
                 backgroundColor: '#fff',
             }}>
                 <PropertyPage update={updateProperties} />
-                <PropertyCreateForm onCreate={refreshProperties} />
+                {isLoggedinProfile && <PropertyCreateForm onCreate={refreshProperties} />}
             </div>
         </div>
     );
