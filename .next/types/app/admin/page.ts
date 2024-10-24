@@ -1,4 +1,4 @@
-// File: C:\Users\sophm\OneDrive\Dokument\typescript\typescript-airbnb\bnb-app\src\app\admin\page.tsx
+// File: C:\Projects\typescript-airbnb\bnb-app\src\app\admin\page.tsx
 import * as entry from '../../../../src/app/admin/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

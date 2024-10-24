@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 
 type Property = {
     id: string;
@@ -12,7 +13,8 @@ type Property = {
 };
 
 export default function PropertyPage() {
-    const [properties, setProperties] = useState<Property[]>([]); // Typ: Array av Property
+    const { userId } = useParams();
+    const [properties, setProperties] = useState<Property[]>([]);
     const [newProperty, setNewProperty] = useState<Omit<Property, 'id'>>({
         name: '',
         description: '',
@@ -21,51 +23,79 @@ export default function PropertyPage() {
         availability: true,
     });
 
+
+
     useEffect(() => {
-        fetch('/api/property')
-            .then((res) => res.json())
-            .then((data) => {
-                console.log('Fetched properties:', data); // Kolla vad som hämtas från API
-                setProperties(data);
-            })
-            .catch((error) => console.error('Error fetching properties:', error));
-    }, []);
+        if (userId) {
+            fetch(`/api/property?userId=${userId}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log('Fetched properties:', data); // Kolla vad som hämtas från API
+                    setProperties(data);
+                })
+                .catch((error) => console.error('Error fetching properties:', error));
+        }
+    }, [userId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await fetch('/api/property', {
+
+        const userId = localStorage.getItem('userId');  // Se till att userId hämtas korrekt
+
+        if (!userId) {
+            console.error("User ID is required to create a property.");
+            return;
+        }
+
+        const response = await fetch('/api/property', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newProperty),
+            body: JSON.stringify({
+                ...newProperty,
+                userId,  // Skicka med userId
+            }),
         });
 
-        // Fetch properties again after creating new property
-        fetch('/api/property')
+        if (!response.ok) {
+            console.error('Failed to create property:', response.statusText);
+            return;
+        }
+
+        const data = await response.json();
+        console.log('Property created:', data);
+
+        // Hämta och visa alla egendomar igen efter att en ny har skapats
+        fetch(`/api/property?userId=${userId}`)
             .then((res) => res.json())
             .then((data) => setProperties(data));
     };
+
 
     return (
         <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
             <h1>Properties</h1>
 
             {/* Property List */}
-            <ul style={{ listStyle: 'none', padding: 0 }}>
-                {properties.map((property) => (
-                    <li key={property.id} style={{
-                        border: '1px solid #ccc',
-                        padding: '15px',
-                        marginBottom: '10px',
-                        borderRadius: '5px',
-                        backgroundColor: '#f9f9f9'
-                    }}>
-                        <strong>{property.name}</strong><br />
-                        Location: {property.location}<br />
-                        Price: ${property.pricePerNight} / night<br />
-                        {property.description && <p>Description: {property.description}</p>}
-                    </li>
-                ))}
-            </ul>
+            {Array.isArray(properties) ? (
+                <ul style={{ listStyle: 'none', padding: 0 }}>
+                    {properties.map((property) => (
+                        <li key={property.id} style={{
+                            border: '1px solid #ccc',
+                            padding: '15px',
+                            marginBottom: '10px',
+                            borderRadius: '5px',
+                            backgroundColor: '#f9f9f9'
+                        }}>
+                            <strong>{property.name}</strong><br />
+                            Location: {property.location}<br />
+                            Price: {property.pricePerNight} SEK / night<br />
+                            {property.description && <p>Description: {property.description}</p>}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p>No Properties </p>
+            )}
 
             <h2>Create New Property</h2>
 

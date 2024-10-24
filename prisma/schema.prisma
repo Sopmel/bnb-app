@@ -8,32 +8,36 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  email     String   @unique
-  password  String
-  isAdmin   Boolean  @default(false)
-  bookings  Booking[] @relation("UserBookings")
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  email      String     @unique
+  password   String
+  isAdmin    Boolean    @default(false)
+  bookings   Booking[]  @relation("UserBookings")
+  properties Property[] @relation("UserProperties")
 }
 
 model Property {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String
-  location    String
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String
+  location      String
   pricePerNight Float
-  availability Boolean
-  bookings       Booking[] @relation("PropertyBookings")
+  availability  Boolean
+  bookings      Booking[] @relation("PropertyBookings")
+  user          User      @relation(fields: [userId], references: [id], name: "UserProperties")
+  userId        String    @db.ObjectId
 }
 
 model Booking {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt      DateTime @default(now())
-  checkInDate    DateTime
-  checkOutDate   DateTime
-  totalPrice     Float
-  user           User     @relation(fields: [userId], references: [id], name: "UserBookings")
-  userId         String   @db.ObjectId
-  property       Property @relation(fields: [propertyId], references: [id], name: "PropertyBookings")
-  propertyId     String   @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+  checkInDate DateTime
+  checkOutDate DateTime
+  totalPrice  Float
+  user        User     @relation(fields: [userId], references: [id], name: "UserBookings")
+  userId      String   @db.ObjectId
+  property    Property @relation(fields: [propertyId], references: [id], name: "PropertyBookings")
+  propertyId  String   @db.ObjectId
 }
+

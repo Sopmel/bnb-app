@@ -1,4 +1,4 @@
-// File: C:\Users\sophm\OneDrive\Dokument\typescript\typescript-airbnb\bnb-app\src\app\api\admin\users\route.ts
+// File: C:\Projects\typescript-airbnb\bnb-app\src\app\api\admin\users\route.ts
 import * as entry from '../../../../../../src/app/api/admin/users/route.js'
 import type { NextRequest } from 'next/server.js'
 
