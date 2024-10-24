@@ -5,12 +5,14 @@ import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 
 import PropertyPage from '../../components/PropertyPage';
+import PropertyCreateForm from '@/app/components/PropertyCreateForm';
 
 const Profile = () => {
     const { userId } = useParams(); // Hämta ID från URL
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [updateProperties, setUpdateProperties] = useState(false);
 
     const router = useRouter();
 
@@ -39,6 +41,10 @@ const Profile = () => {
     }, [userId]);
 
     if (!user) return <p>Loading profile...</p>;
+
+    const refreshProperties = () => {
+        setUpdateProperties((prev) => !prev); // ladda om PropertyPage-komponenten
+    };
 
     const handleDeleteAccount = async () => {
         try {
@@ -148,7 +154,8 @@ const Profile = () => {
                 borderRadius: '10px',
                 backgroundColor: '#fff',
             }}>
-                <PropertyPage />
+                <PropertyPage update={updateProperties} />
+                <PropertyCreateForm onCreate={refreshProperties} />
             </div>
         </div>
     );

@@ -1,13 +1,4 @@
 {
-  "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/api/property/route": "app/api/property/route.js",
-  "/admin/page": "app/admin/page.js",
-  "/api/admin/users/route": "app/api/admin/users/route.js",
-  "/profile/[userId]/page": "app/profile/[userId]/page.js",
-  "/register/page": "app/register/page.js",
-  "/api/user/profile/[userId]/route": "app/api/user/profile/[userId]/route.js",
-  "/api/auth/register/route": "app/api/auth/register/route.js",
-  "/api/admin/delete/[userId]/route": "app/api/admin/delete/[userId]/route.js",
-  "/api/auth/login/route": "app/api/auth/login/route.js"
+  "/profile/[userId]/page": "app/profile/[userId]/page.js"
 }

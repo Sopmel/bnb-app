@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import PropertyActions from './PropertyActions'; // Importera den nya komponenten
+import PropertyEditModal from './PropertyEditModal'; // Importera EditPropertyModal
 
 type Property = {
     id: string;
@@ -12,64 +14,63 @@ type Property = {
     availability: boolean;
 };
 
-export default function PropertyPage() {
+export default function PropertyPage({ update }: { update: boolean }) {
     const { userId } = useParams();
     const [properties, setProperties] = useState<Property[]>([]);
-    const [newProperty, setNewProperty] = useState<Omit<Property, 'id'>>({
-        name: '',
-        description: '',
-        location: '',
-        pricePerNight: 0,
-        availability: true,
-    });
-
-
+    const [propertyToEdit, setPropertyToEdit] = useState<Property | null>(null);
 
     useEffect(() => {
         if (userId) {
             fetch(`/api/property?userId=${userId}`)
                 .then((res) => res.json())
                 .then((data) => {
-                    console.log('Fetched properties:', data); // Kolla vad som hämtas från API
                     setProperties(data);
                 })
                 .catch((error) => console.error('Error fetching properties:', error));
         }
-    }, [userId]);
+    }, [userId, update]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const userId = localStorage.getItem('userId');  // Se till att userId hämtas korrekt
-
-        if (!userId) {
-            console.error("User ID is required to create a property.");
-            return;
-        }
-
-        const response = await fetch('/api/property', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...newProperty,
-                userId,  // Skicka med userId
-            }),
-        });
-
-        if (!response.ok) {
-            console.error('Failed to create property:', response.statusText);
-            return;
-        }
-
-        const data = await response.json();
-        console.log('Property created:', data);
-
-        // Hämta och visa alla egendomar igen efter att en ny har skapats
-        fetch(`/api/property?userId=${userId}`)
-            .then((res) => res.json())
-            .then((data) => setProperties(data));
+    const handleEdit = (property: Property) => {
+        setPropertyToEdit(property);
     };
 
+    const handleDelete = async (propertyId: string) => {
+        if (!window.confirm("Are you sure you want to delete this property?")) return;
+
+        const response = await fetch(`/api/property/${propertyId}`, {
+            method: 'DELETE',
+        });
+
+        if (response.ok) {
+            setProperties((prevProperties) => prevProperties.filter((p) => p.id !== propertyId));
+        } else {
+            console.error('Failed to delete property');
+        }
+    };
+
+    const handleEditSubmit = async (updatedProperty: Omit<Property, 'id'>) => {
+        if (!propertyToEdit) return;
+
+        const response = await fetch(`/api/property/${propertyToEdit.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedProperty),
+        });
+
+        if (response.ok) {
+            const updatedProp = await response.json();
+            setProperties((prevProperties) =>
+                prevProperties.map((p) => (p.id === updatedProp.id ? updatedProp : p))
+            );
+            setPropertyToEdit(null);
+        } else {
+            console.error('Failed to update property');
+        }
+    };
+
+    const closeModal = () => {
+        setPropertyToEdit(null);
+    };
 
     return (
         <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
@@ -84,61 +85,43 @@ export default function PropertyPage() {
                             padding: '15px',
                             marginBottom: '10px',
                             borderRadius: '5px',
-                            backgroundColor: '#f9f9f9'
+                            backgroundColor: '#f9f9f9',
+                            position: 'relative'
                         }}>
                             <strong>{property.name}</strong><br />
                             Location: {property.location}<br />
                             Price: {property.pricePerNight} SEK / night<br />
                             {property.description && <p>Description: {property.description}</p>}
+
+                            {/* PropertyActions-komponenten används här */}
+                            <div style={{
+                                position: 'absolute',
+                                top: '10px',
+                                right: '10px',
+                                display: 'flex',
+                                gap: '10px'
+                            }}>
+                                <PropertyActions
+                                    property={property}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
+                                />
+                            </div>
                         </li>
                     ))}
                 </ul>
             ) : (
-                <p>No Properties </p>
+                <p>No Properties</p>
             )}
 
-            <h2>Create New Property</h2>
-
-            {/* Create Property Form */}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <input
-                    type="text"
-                    placeholder="Name"
-                    value={newProperty.name}
-                    onChange={(e) => setNewProperty({ ...newProperty, name: e.target.value })}
-                    style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+            {/* Edit Property Popup Modal */}
+            {propertyToEdit && (
+                <PropertyEditModal
+                    property={propertyToEdit}
+                    onClose={closeModal}
+                    onSubmit={handleEditSubmit}
                 />
-                <input
-                    type="text"
-                    placeholder="Description"
-                    value={newProperty.description}
-                    onChange={(e) => setNewProperty({ ...newProperty, description: e.target.value })}
-                    style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
-                />
-                <input
-                    type="text"
-                    placeholder="Location"
-                    value={newProperty.location}
-                    onChange={(e) => setNewProperty({ ...newProperty, location: e.target.value })}
-                    style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
-                />
-                <input
-                    type="number"
-                    placeholder="Price per Night"
-                    value={newProperty.pricePerNight}
-                    onChange={(e) => setNewProperty({ ...newProperty, pricePerNight: parseFloat(e.target.value) })}
-                    style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
-                />
-                <button type="submit" style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                }}>Create Property</button>
-            </form>
+            )}
         </div>
     );
 }
