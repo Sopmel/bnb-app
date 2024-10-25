@@ -14,7 +14,7 @@ type Property = {
     availability: boolean;
 };
 
-export default function PropertyPage({ update }: { update: boolean }) {
+export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { update: boolean; isLoggedinProfile: boolean; isAdmin: boolean }) {
     const { userId } = useParams();
     const [properties, setProperties] = useState<Property[]>([]);
     const [propertyToEdit, setPropertyToEdit] = useState<Property | null>(null);
@@ -101,11 +101,13 @@ export default function PropertyPage({ update }: { update: boolean }) {
                                 display: 'flex',
                                 gap: '10px'
                             }}>
-                                <PropertyActions
-                                    property={property}
-                                    onEdit={handleEdit}
-                                    onDelete={handleDelete}
-                                />
+                                {(isLoggedinProfile || isAdmin) && (
+                                    <PropertyActions
+                                        property={property}
+                                        onEdit={handleEdit}
+                                        onDelete={handleDelete}
+                                    />
+                                )}
                             </div>
                         </li>
                     ))}

@@ -160,7 +160,7 @@ const Profile = () => {
                 borderRadius: '10px',
                 backgroundColor: '#fff',
             }}>
-                <PropertyPage update={updateProperties} />
+                <PropertyPage update={updateProperties} isLoggedinProfile={isLoggedinProfile} isAdmin={isAdmin} />
                 {isLoggedinProfile && <PropertyCreateForm onCreate={refreshProperties} />}
             </div>
         </div>
