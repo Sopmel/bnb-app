@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -6,26 +6,39 @@ import axios from 'axios';
 
 import PropertyPage from '../../components/PropertyPage';
 import PropertyCreateForm from '@/app/components/PropertyCreateForm';
+import MessageButton from '@/app/components/MessageButton';
+//import BookingRequests from '@/app/components/BookingRequests';
 
 const Profile = () => {
-    const { userId } = useParams(); // Hämta ID från URL
+    const { userId: userIdParam } = useParams(); // Hämta ID från URL
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [updateProperties, setUpdateProperties] = useState(false);
     const [isLoggedinProfile, setIsLoggedinProfile] = useState(false);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
 
     const router = useRouter();
 
+    // Hantera potentiella `string[]` och konvertera till `string`
+    const userId = Array.isArray(userIdParam) ? userIdParam[0] : userIdParam;
+
     useEffect(() => {
-        const adminStatus = localStorage.getItem('isAdmin') === 'true';
-        const currentUserId = localStorage.getItem('userId');
-        setIsAdmin(adminStatus);
+        // Kontrollera att `localStorage` finns och hämta `userId` från den
+        if (typeof window !== "undefined") {
+            const storedUserId = localStorage.getItem("userId");
+            setCurrentUserId(storedUserId);
+            const adminStatus = localStorage.getItem("isAdmin") === "true";
+            setIsAdmin(adminStatus);
 
-        if (userId && currentUserId === userId) {
-            setIsLoggedinProfile(true);
+            if (userId && storedUserId === userId) {
+                setIsLoggedinProfile(true);
+            }
         }
+    }, [userId]);
 
+    useEffect(() => {
         if (userId) {
             const fetchUser = async () => {
                 try {
@@ -52,6 +65,10 @@ const Profile = () => {
         setUpdateProperties((prev) => !prev); // ladda om PropertyPage-komponenten
     };
 
+    const navigateToMessages = () => {
+        router.push('/message'); // Navigera till meddelandesidan
+    };
+
     const handleDeleteAccount = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -61,8 +78,7 @@ const Profile = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            // egna konto
-            if (userId === localStorage.getItem('userId')) {
+            if (userId === currentUserId) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('isAdmin');
                 localStorage.removeItem('userId');
@@ -80,7 +96,7 @@ const Profile = () => {
             const token = localStorage.getItem('token');
             if (!token) return;
 
-            const action = user.isAdmin ? 'downgrade' : 'upgrade'; // Bestäm action baserat på status
+            const action = user.isAdmin ? 'downgrade' : 'upgrade';
             await axios.post(`/api/admin/upgrade/${userId}`, { action }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -111,17 +127,39 @@ const Profile = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '10px' }}>{user.name}'s Profile</h1>
 
-                    {/* Settings Button - Positioned at top-left inside the profile section */}
-                    <button onClick={toggleDropdown} className="focus:outline-none" style={{
+                    {/* MessageButton */}
+                    {currentUserId && userId && currentUserId !== userId && (
+                        <MessageButton senderId={currentUserId} receiverId={userId} />
+                    )}
+
+                    {isLoggedinProfile && (
+                        <button onClick={navigateToMessages} style={{
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            padding: '8px 15px',
+                            borderRadius: '20px',
+                            fontSize: '1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            cursor: 'pointer'
+                        }}>
+                            <i className="fas fa-envelope"></i> Go to Messages
+                        </button>
+                    )}
+
+                    <button onClick={toggleDropdown} style={{
                         backgroundColor: '#007bff',
                         color: 'white',
-                        padding: '10px 15px',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        alignSelf: 'flex-start' // Makes the button align at the top left
+                        padding: '8px 15px',
+                        borderRadius: '20px',
+                        fontSize: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        cursor: 'pointer'
                     }}>
-                        Settings <i className="fas fa-cog"></i>
+                        <i className="fas fa-cog"></i> Settings
                     </button>
                 </div>
 
@@ -141,7 +179,7 @@ const Profile = () => {
                             </>
                         )}
 
-                        {!isAdmin && userId === localStorage.getItem('userId') && (
+                        {!isAdmin && userId === currentUserId && (
                             <button onClick={handleDeleteAccount} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                                 Delete Account
                             </button>
@@ -163,6 +201,19 @@ const Profile = () => {
                 <PropertyPage update={updateProperties} isLoggedinProfile={isLoggedinProfile} isAdmin={isAdmin} />
                 {isLoggedinProfile && <PropertyCreateForm onCreate={refreshProperties} />}
             </div>
+
+            {/* {isLoggedinProfile && (
+                <div style={{
+                    padding: '20px',
+                    border: '1px solid #ccc',
+                    borderRadius: '10px',
+                    backgroundColor: '#fff',
+                }}>
+                    <h2>Booking Requests</h2>
+                    <BookingRequests />
+                </div>
+            )} */}
+
         </div>
     );
 };

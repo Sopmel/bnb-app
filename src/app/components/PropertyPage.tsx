@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import PropertyActions from './PropertyActions'; // Importera den nya komponenten
-import PropertyEditModal from './PropertyEditModal'; // Importera EditPropertyModal
+import PropertyActions from './PropertyActions';
+import PropertyEditModal from './PropertyEditModal';
+import BookingForm from './BookingForm';
 
 type Property = {
     id: string;
@@ -18,6 +19,7 @@ export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { u
     const { userId } = useParams();
     const [properties, setProperties] = useState<Property[]>([]);
     const [propertyToEdit, setPropertyToEdit] = useState<Property | null>(null);
+    const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
     useEffect(() => {
         if (userId) {
@@ -29,6 +31,14 @@ export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { u
                 .catch((error) => console.error('Error fetching properties:', error));
         }
     }, [userId, update]);
+
+    const handleOpenBookingForm = (property: Property) => {
+        setSelectedProperty(property);
+    };
+
+    const handleCloseBookingForm = () => {
+        setSelectedProperty(null);
+    };
 
     const handleEdit = (property: Property) => {
         setPropertyToEdit(property);
@@ -93,7 +103,13 @@ export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { u
                             Price: {property.pricePerNight} SEK / night<br />
                             {property.description && <p>Description: {property.description}</p>}
 
-                            {/* PropertyActions-komponenten används här */}
+                            <button
+                                onClick={() => handleOpenBookingForm(property)}
+                                style={{ marginTop: '10px', backgroundColor: '#007bff', color: 'white', padding: '8px', borderRadius: '5px' }}
+                            >
+                                Book this Property
+                            </button>
+
                             <div style={{
                                 position: 'absolute',
                                 top: '10px',
@@ -114,6 +130,18 @@ export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { u
                 </ul>
             ) : (
                 <p>No Properties</p>
+            )}
+
+            {selectedProperty && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '5px', maxWidth: '400px', width: '100%' }}>
+                        <h2>Booking for {selectedProperty.name}</h2>
+                        <BookingForm propertyId={selectedProperty.id} />
+                        <button onClick={handleCloseBookingForm} style={{ marginTop: '10px', backgroundColor: 'red', color: 'white', padding: '8px', borderRadius: '5px' }}>
+                            Close
+                        </button>
+                    </div>
+                </div>
             )}
 
             {/* Edit Property Popup Modal */}
