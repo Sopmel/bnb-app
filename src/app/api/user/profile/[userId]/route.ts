@@ -56,6 +56,4 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
     }
 }
 
-export const config = {
-    runtime: 'nodejs', // Om du behöver specificera runtime
-};
+export const runtime = "nodejs";
