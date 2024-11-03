@@ -18,8 +18,8 @@ const BookingForm = ({ propertyId }: { propertyId: string }) => {
                 userId,
                 message,
                 type,
-                bookingId,  // Lägg till bookingId om det är en bokning
-                messageId,  // Lägg till messageId om det är ett meddelande
+                bookingId,
+                messageId,
             }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -32,6 +32,7 @@ const BookingForm = ({ propertyId }: { propertyId: string }) => {
     const handleBookingRequest = async () => {
         if (isSubmitting) return; // Förhindra dubbelklick
         setIsSubmitting(true);
+
         try {
             const token = localStorage.getItem("token");
             if (!token) {

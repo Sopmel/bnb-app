@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
             data: notificationData,
         });
 
+        console.log('Notification created:', notification);
+
         return NextResponse.json(notification, { status: 201 });
     } catch (error) {
         console.error('Error creating notification', error);

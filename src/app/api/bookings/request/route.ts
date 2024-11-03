@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Property not found" }, { status: 404 });
         }
 
-        // Beräkna kostnaden för bokningen
+
         const nights = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));
         const cost = nights * property.pricePerNight;
 
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     try {
-        // Extrahera användarens ID från token för att få bokningsförfrågningar för en specifik användare
+
         const token = req.headers.get("Authorization")?.split(" ")[1];
         const decodedToken = token ? jwt.verify(token, process.env.JWT_SECRET!) : null;
         const userId = decodedToken ? (decodedToken as { userId: string }).userId : null;
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
                 status: BookingStatus.PENDING,
             },
             include: {
-                user: true,  // Hämtar användarinformation för att visa gästens namn
+                user: true,
             }
         });
 

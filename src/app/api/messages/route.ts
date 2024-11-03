@@ -20,16 +20,6 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        await prisma.notification.create({
-            data: {
-                userId: receiverId,
-                message: 'You have a new message',
-                type: NotificationType.MESSAGE,
-                messageId: newMessage.id,
-                read: false,
-            },
-        });
-
         return NextResponse.json(newMessage, { status: 201 });
     } catch (error) {
         console.error("Error creating message:", error);

@@ -12,9 +12,7 @@ const MessageButton = ({ senderId, receiverId }: MessageButtonProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSendMessage = async () => {
-        if (isSubmitting) return;  // Säkerställ att vi inte kör om funktionen
-
-        // Direkt inaktivera ytterligare händelser
+        if (isSubmitting) return;
         setIsSubmitting(true);
 
         try {
@@ -37,7 +35,7 @@ const MessageButton = ({ senderId, receiverId }: MessageButtonProps) => {
         } catch (error) {
             console.error('Failed to send message:', error);
         } finally {
-            // Återställ för nya meddelanden efter allt är klart
+
             setIsSubmitting(false);
         }
     };
