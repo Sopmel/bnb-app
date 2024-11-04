@@ -1,0 +1,1 @@
+{"version":1,"functions":{"/api/admin/delete/[userId]":{},"/api/bookings/MyBookings":{},"/api/bookings/bookedProperties":{},"/api/user/delete":{},"/api/admin/users":{},"/api/admin/upgrade":{},"/api/user/profile/[userId]":{},"/api/admin/upgrade/[userId]":{}}}
