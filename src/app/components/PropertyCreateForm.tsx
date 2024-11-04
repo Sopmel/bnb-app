@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getLocalStorageItem } from '../utils/localStorageUtil';
 
 type Property = {
     id: string;
@@ -23,7 +24,7 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const userId = localStorage.getItem('userId');  // Se till att userId hämtas korrekt
+        const userId = getLocalStorageItem('userId');
 
         if (!userId) {
             console.error("User ID is required to create a property.");

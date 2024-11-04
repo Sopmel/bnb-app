@@ -7,7 +7,7 @@ import axios from 'axios';
 import PropertyPage from '../../components/PropertyPage';
 import PropertyCreateForm from '@/app/components/PropertyCreateForm';
 import MessageButton from '@/app/components/MessageButton';
-//import BookingRequests from '@/app/components/BookingRequests';
+import { getLocalStorageItem, setLocalStorageItem } from '../../utils/localStorageUtil';
 
 const Profile = () => {
     const { userId: userIdParam } = useParams(); // Hämta ID från URL
@@ -18,23 +18,20 @@ const Profile = () => {
     const [isLoggedinProfile, setIsLoggedinProfile] = useState(false);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-
     const router = useRouter();
 
     // Hantera potentiella `string[]` och konvertera till `string`
     const userId = Array.isArray(userIdParam) ? userIdParam[0] : userIdParam;
 
     useEffect(() => {
-        // Kontrollera att `localStorage` finns och hämta `userId` från den
-        if (typeof window !== "undefined") {
-            const storedUserId = localStorage.getItem("userId");
-            setCurrentUserId(storedUserId);
-            const adminStatus = localStorage.getItem("isAdmin") === "true";
-            setIsAdmin(adminStatus);
+        // Hämta `userId` och `isAdmin` från `localStorage`
+        const storedUserId = getLocalStorageItem("userId");
+        setCurrentUserId(storedUserId);
+        const adminStatus = getLocalStorageItem("isAdmin") === "true";
+        setIsAdmin(adminStatus);
 
-            if (userId && storedUserId === userId) {
-                setIsLoggedinProfile(true);
-            }
+        if (userId && storedUserId === userId) {
+            setIsLoggedinProfile(true);
         }
     }, [userId]);
 
@@ -42,7 +39,7 @@ const Profile = () => {
         if (userId) {
             const fetchUser = async () => {
                 try {
-                    const token = localStorage.getItem("token");
+                    const token = getLocalStorageItem("token");
                     if (!token) return;
 
                     const response = await axios.get(`/api/user/profile/${userId}`, {
@@ -62,7 +59,7 @@ const Profile = () => {
     if (!user) return <p>Loading profile...</p>;
 
     const refreshProperties = () => {
-        setUpdateProperties((prev) => !prev); // ladda om PropertyPage-komponenten
+        setUpdateProperties((prev) => !prev); // Ladda om PropertyPage-komponenten
     };
 
     const navigateToMessages = () => {
@@ -71,7 +68,7 @@ const Profile = () => {
 
     const handleDeleteAccount = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = getLocalStorageItem('token');
             if (!token) return;
 
             await axios.delete(`/api/admin/delete/${userId}`, {
@@ -79,9 +76,9 @@ const Profile = () => {
             });
 
             if (userId === currentUserId) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('isAdmin');
-                localStorage.removeItem('userId');
+                setLocalStorageItem('token', '');
+                setLocalStorageItem('isAdmin', 'false');
+                setLocalStorageItem('userId', '');
                 router.push('/login');
             } else {
                 router.push('/admin');
@@ -93,7 +90,7 @@ const Profile = () => {
 
     const handleToggleAdminStatus = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = getLocalStorageItem('token');
             if (!token) return;
 
             const action = user.isAdmin ? 'downgrade' : 'upgrade';
@@ -201,19 +198,6 @@ const Profile = () => {
                 <PropertyPage update={updateProperties} isLoggedinProfile={isLoggedinProfile} isAdmin={isAdmin} />
                 {isLoggedinProfile && <PropertyCreateForm onCreate={refreshProperties} />}
             </div>
-
-            {/* {isLoggedinProfile && (
-                <div style={{
-                    padding: '20px',
-                    border: '1px solid #ccc',
-                    borderRadius: '10px',
-                    backgroundColor: '#fff',
-                }}>
-                    <h2>Booking Requests</h2>
-                    <BookingRequests />
-                </div>
-            )} */}
-
         </div>
     );
 };

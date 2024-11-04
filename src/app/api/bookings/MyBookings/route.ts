@@ -32,3 +32,5 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Error fetching user bookings" }, { status: 500 });
     }
 }
+
+export const runtime = "nodejs";

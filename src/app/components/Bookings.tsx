@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import UserBookings from './UserBookings';
 import BookingRequests from './BookingRequests';
+import { getLocalStorageItem } from '../utils/localStorageUtil';
 
 type BookedProperty = {
     id: string;
@@ -20,7 +21,7 @@ const Bookings = ({ userId }: { userId: string }) => {
     useEffect(() => {
         const fetchBookedProperties = async () => {
             try {
-                const token = localStorage.getItem("token");
+                const token = getLocalStorageItem("token");
                 if (!token) {
                     setError("User not authenticated");
                     return;

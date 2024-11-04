@@ -22,6 +22,4 @@ export async function GET() {
     }
 }
 
-export const config = {
-    runtime: 'nodejs', // Om det behövs för server-miljöer
-};
+export const runtime = "nodejs"

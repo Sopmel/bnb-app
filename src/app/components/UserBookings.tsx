@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getLocalStorageItem } from '../utils/localStorageUtil';
 
 type Booking = {
     id: string;
@@ -20,7 +21,7 @@ const UserBookings = ({ userId }: { userId: string }) => {
     useEffect(() => {
         const fetchUserBookings = async () => {
             try {
-                const token = localStorage.getItem("token");
+                const token = getLocalStorageItem("token");
                 if (!token) {
                     setError("User not authenticated");
                     return;
@@ -42,7 +43,7 @@ const UserBookings = ({ userId }: { userId: string }) => {
 
     const handleCancelBooking = async (bookingId: string) => {
         try {
-            const token = localStorage.getItem("token");
+            const token = getLocalStorageItem("token");
             if (!token) {
                 alert("Please log in to cancel the booking.");
                 return;

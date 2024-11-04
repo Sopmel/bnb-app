@@ -3,11 +3,15 @@
   "/login/page": "app/login/page.js",
   "/profile/[userId]/page": "app/profile/[userId]/page.js",
   "/admin/page": "app/admin/page.js",
-  "/message/page": "app/message/page.js",
-  "/api/bookings/MyBookings/route": "app/api/bookings/MyBookings/route.js",
+  "/api/notifications/route": "app/api/notifications/route.js",
   "/api/bookings/request/route": "app/api/bookings/request/route.js",
-  "/api/bookings/bookedProperties/route": "app/api/bookings/bookedProperties/route.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/api/messages/[userId]/received/route": "app/api/messages/[userId]/received/route.js",
+  "/api/messages/[userId]/sent/route": "app/api/messages/[userId]/sent/route.js",
   "/api/notifications/[notificationId]/route": "app/api/notifications/[notificationId]/route.js",
-  "/api/user/profile/[userId]/route": "app/api/user/profile/[userId]/route.js",
-  "/api/property/route": "app/api/property/route.js"
+  "/message/page": "app/message/page.js",
+  "/api/bookings/bookedProperties/route": "app/api/bookings/bookedProperties/route.js",
+  "/api/bookings/MyBookings/route": "app/api/bookings/MyBookings/route.js",
+  "/api/bookings/approve/route": "app/api/bookings/approve/route.js",
+  "/api/bookings/decline/route": "app/api/bookings/decline/route.js"
 }

@@ -3,34 +3,40 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from "axios";
+import useLocalStorage from '../hooks/useLocalStorage';
+import { getLocalStorageItem } from '../utils/localStorageUtil';
 
 const AdminPage = () => {
     const router = useRouter();
-    const [users, setUsers] = useState<any[]>([]); // Lagrar alla användare
-    const [filteredUsers, setFilteredUsers] = useState<any[]>([]); // Lagrar filtrerade användare
-    const [searchTerm, setSearchTerm] = useState(''); // Hanterar sökfältets värde
+    const [isAdmin] = useLocalStorage("isAdmin", "false");
+    const [users, setUsers] = useState<any[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [showUsers, setShowUsers] = useState(false); // Ny state för att visa/hide användarlistan
+    const [showUsers, setShowUsers] = useState(false);
 
     // Kontrollera om användaren är admin
     useEffect(() => {
-        const isAdmin = localStorage.getItem('isAdmin') === 'true';
-        if (!isAdmin) {
+        if (isAdmin === null) return; // Vänta tills värdet har laddats in
+
+        console.log("Admin status:", isAdmin);
+        if (isAdmin !== "true") {
             router.push('/');  // Omdirigera om användaren inte är admin
         }
-    }, [router]);
+    }, [isAdmin, router]);
+
 
     // Hämta alla användare från backend när sidan laddas
     useEffect(() => {
         const fetchUsers = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                if (!token) {
-                    setError("Ingen giltig token hittad.");
-                    return;
-                }
+            const token = getLocalStorageItem("token"); // Använd `getLocalStorageItem` för att hämta token
+            if (!token) {
+                setError("Ingen giltig token hittad.");
+                return;
+            }
 
+            try {
                 const response = await axios.get("/api/admin/users", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -46,7 +52,8 @@ const AdminPage = () => {
         fetchUsers();
     }, []);
 
-    // Hantera ändring i sökfältet
+
+
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value.toLowerCase();
         setSearchTerm(value);
