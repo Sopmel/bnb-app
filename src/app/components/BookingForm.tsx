@@ -1,6 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import axios from 'axios';
+import { getLocalStorageItem } from '../utils/localStorageUtil';
 
 const BookingForm = ({ propertyId }: { propertyId: string }) => {
     const [startDate, setStartDate] = useState('');
@@ -11,7 +12,7 @@ const BookingForm = ({ propertyId }: { propertyId: string }) => {
 
     const createNotification = async (userId: string, message: string, type: 'BOOKING_REQUEST' | 'MESSAGE', bookingId?: string, messageId?: string) => {
         try {
-            const token = localStorage.getItem("token");
+            const token = getLocalStorageItem("token");
             if (!token) return;
 
             await axios.post('/api/notifications', {
@@ -28,13 +29,12 @@ const BookingForm = ({ propertyId }: { propertyId: string }) => {
         }
     };
 
-
     const handleBookingRequest = async () => {
         if (isSubmitting) return; // Förhindra dubbelklick
         setIsSubmitting(true);
 
         try {
-            const token = localStorage.getItem("token");
+            const token = getLocalStorageItem("token");
             if (!token) {
                 alert("Please log in to make a booking.");
                 return;
@@ -58,15 +58,16 @@ const BookingForm = ({ propertyId }: { propertyId: string }) => {
                     ownerId,
                     `New booking request for property with ID ${propertyId}.`,
                     'BOOKING_REQUEST',
-                    bookingId  // Koppla notisen till bokningen
+                    bookingId
                 );
             }
         } catch (error) {
             console.error("Error creating booking:", error);
             alert("Error creating booking");
+        } finally {
+            setIsSubmitting(false);
         }
     };
-
 
     return (
         <>

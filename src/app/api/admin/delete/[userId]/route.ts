@@ -20,3 +20,5 @@ export async function DELETE(req: NextRequest, { params }: { params: { userId: s
         return NextResponse.json({ message: 'Failed to delete user' }, { status: 500 });
     }
 }
+
+export const runtime = "nodejs"

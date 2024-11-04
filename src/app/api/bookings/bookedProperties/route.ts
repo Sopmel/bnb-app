@@ -33,3 +33,5 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Error fetching booked properties" }, { status: 500 });
     }
 }
+
+export const runtime = "nodejs";

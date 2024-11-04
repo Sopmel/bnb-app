@@ -4,12 +4,14 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { decodeJWT } from '../utils/jwtDecoder';
+import { setLocalStorageItem } from '../utils/localStorageUtil';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,9 +37,9 @@ const Login = () => {
                 const userId = decodedToken.userId;
 
                 // Spara token och admin-status i localStorage
-                localStorage.setItem('token', token);
-                localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
-                localStorage.setItem('userId', userId);
+                setLocalStorageItem('token', token);
+                setLocalStorageItem('isAdmin', isAdmin ? 'true' : 'false');
+                setLocalStorageItem('userId', userId);
 
                 window.dispatchEvent(new Event('login'));  // Trigga login-event
                 router.push('/');

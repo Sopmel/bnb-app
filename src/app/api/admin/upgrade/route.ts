@@ -29,6 +29,4 @@ export async function POST(req: NextRequest) {
     }
 }
 
-export const config = {
-    runtime: 'nodejs', // Om det behövs för server-miljöer
-};
+export const runtime = "nodejs"

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import Notifications from './notifications';
+import { getLocalStorageItem, setLocalStorageItem } from '../utils/localStorageUtil';
 
 type Notification = {
     id: string;
@@ -29,9 +30,9 @@ const Header = () => {
     // Kontrollera inloggningsstatus
     useEffect(() => {
         const checkLoginStatus = () => {
-            const token = localStorage.getItem('token');
-            const userIsAdmin = localStorage.getItem('isAdmin') === 'true';
-            const storedUserId = localStorage.getItem('userId');
+            const token = getLocalStorageItem('token');
+            const userIsAdmin = getLocalStorageItem('isAdmin') === 'true';
+            const storedUserId = getLocalStorageItem('userId');
 
             setIsLoggedIn(!!token);
             setIsAdmin(userIsAdmin);
@@ -51,7 +52,7 @@ const Header = () => {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = getLocalStorageItem('token');
                 if (!token) return;
 
                 const response = await axios.get('/api/notifications', {
@@ -81,7 +82,7 @@ const Header = () => {
     // Markera som läst
     const markAsRead = async (notificationId: string) => {
         try {
-            const token = localStorage.getItem("token");
+            const token = getLocalStorageItem('token');
 
             // Markera som läst
             await axios.patch(`/api/notifications/${notificationId}`, null, {
@@ -105,9 +106,9 @@ const Header = () => {
 
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('isAdmin');
-        localStorage.removeItem('userId');
+        setLocalStorageItem('token', '');
+        setLocalStorageItem('isAdmin', 'false');
+        setLocalStorageItem('userId', '');
         setIsLoggedIn(false);
         setIsAdmin(false);
         setUserId(null);

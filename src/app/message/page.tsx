@@ -1,9 +1,10 @@
 "use client";
 
 import MessagesList from '@/app/components/MessagesList';
+import { getLocalStorageItem } from '../utils/localStorageUtil';
 
 const MessagesPage = () => {
-    const currentUserId = localStorage.getItem('userId');  // Du kan anpassa detta beroende på din autentisering
+    const currentUserId = getLocalStorageItem('userId');  // Du kan anpassa detta beroende på din autentisering
 
     if (!currentUserId) {
         return <p>You need to log in to view messages.</p>;

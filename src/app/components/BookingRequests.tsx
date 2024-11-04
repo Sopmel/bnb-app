@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getLocalStorageItem } from '../utils/localStorageUtil';
 
 type BookingRequest = {
     id: string;
@@ -17,7 +18,7 @@ const BookingRequests = () => {
 
     useEffect(() => {
         const fetchRequests = async () => {
-            const token = localStorage.getItem("token");
+            const token = getLocalStorageItem("token");
             if (!token) {
                 setError("User not authenticated");
                 setLoading(false);
@@ -42,7 +43,7 @@ const BookingRequests = () => {
 
     const createNotification = async (userId: string, message: string) => {
         try {
-            const token = localStorage.getItem("token");
+            const token = getLocalStorageItem("token");
             if (!token) return;
 
             await axios.post('/api/notifications', { userId, message }, {
@@ -55,7 +56,7 @@ const BookingRequests = () => {
 
     const handleApprove = async (bookingId: string) => {
         try {
-            const token = localStorage.getItem("token");
+            const token = getLocalStorageItem("token");
             if (!token) return;
 
             await axios.post('/api/bookings/approve', { bookingId }, {
@@ -76,7 +77,7 @@ const BookingRequests = () => {
 
     const handleDecline = async (bookingId: string) => {
         try {
-            const token = localStorage.getItem("token");
+            const token = getLocalStorageItem("token");
             if (!token) return;
 
             await axios.post('/api/bookings/decline', { bookingId }, {

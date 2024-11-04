@@ -31,6 +31,4 @@ export async function DELETE(req: NextRequest) {
     }
 }
 
-export const config = {
-    runtime: 'nodejs', // Om det behövs för server-miljöer
-};
+export const runtime = "nodejs"
