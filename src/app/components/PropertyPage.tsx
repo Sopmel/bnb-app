@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import PropertyActions from './PropertyActions';
@@ -17,14 +15,19 @@ type Property = {
     userId?: string;
 };
 
-type EditableProperty = Omit<Property, 'id' | 'userId'>
+type EditableProperty = Omit<Property, 'id' | 'userId'>;
 
-
-export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { update: boolean; isLoggedinProfile: boolean; isAdmin: boolean }) {
+export default function PropertyPage({ update, isLoggedinProfile, isAdmin, currentUserId }: {
+    update: boolean;
+    isLoggedinProfile: boolean;
+    isAdmin: boolean;
+    currentUserId: string | null;
+}) {
     const { userId } = useParams();
     const [properties, setProperties] = useState<Property[]>([]);
     const [propertyToEdit, setPropertyToEdit] = useState<Property | null>(null);
     const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+    const [totalCost, setTotalCost] = useState<number>(0);
 
     useEffect(() => {
         if (userId) {
@@ -87,6 +90,10 @@ export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { u
         setPropertyToEdit(null);
     };
 
+    const handleTotalCostUpdate = (cost: number) => {
+        setTotalCost(cost);
+    };
+
     return (
         <div className="p-8 max-w-7xl mx-auto">
             <h1 className="text-4xl font-bold mb-8 text-center">Properties</h1>
@@ -111,8 +118,8 @@ export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { u
                                 </p>
                                 <p className="text-gray-700 mt-4">{property.description}</p>
 
-                                {/* Visa bokningsknappen bara om det inte är användarens egna egendom */}
-                                {property.userId !== userId && (
+                                {/* Visa bokningsknappen bara om det inte är användarens egna profil */}
+                                {property.userId !== currentUserId && (
                                     <button
                                         onClick={() => handleOpenBookingForm(property)}
                                         className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -123,7 +130,7 @@ export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { u
                             </div>
 
                             {/* Visa redigera och radera knappar om användaren är ägare eller admin */}
-                            {(property.userId === userId || isAdmin) && (
+                            {(property.userId === currentUserId || isAdmin) && (
                                 <div className="absolute top-4 right-4 flex space-x-2 bg-white rounded-full p-2 shadow-md">
                                     <PropertyActions
                                         property={property}
@@ -144,7 +151,14 @@ export default function PropertyPage({ update, isLoggedinProfile, isAdmin }: { u
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-8 rounded-lg max-w-md w-full">
                         <h2 className="text-2xl font-bold mb-4">Booking for {selectedProperty.name}</h2>
-                        <BookingForm propertyId={selectedProperty.id} />
+                        <BookingForm
+                            propertyId={selectedProperty.id}
+                            pricePerNight={selectedProperty.pricePerNight}
+                            onTotalCostUpdate={handleTotalCostUpdate}
+                        />
+                        <p className="text-lg font-semibold mt-4 text-center text-green-700">
+                            Total kostnad: {totalCost.toLocaleString()} SEK
+                        </p>
                         <button
                             onClick={handleCloseBookingForm}
                             className="mt-4 bg-red-500 text-white py-2 px-4 rounded-lg w-full hover:bg-red-600 transition-colors"

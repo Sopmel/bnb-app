@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { decodeJWT } from "./utils/jwtDecoder";
 import { getLocalStorageItem, setLocalStorageItem } from "./utils/localStorageUtil";
 import axios from "axios";
-import SearchAndFilter from "./components/SearchAndFilter"; // Importera SearchAndFilter-komponenten
+import Link from "next/link";
+import SearchAndFilter from "./components/SearchAndFilter";
+import PropertyDetail from "./components/PropertDetail";
 
 type Property = {
   id: string;
@@ -13,7 +15,9 @@ type Property = {
   description: string;
   pricePerNight: number;
   imageUrl?: string;
+  userId?: string;
   user?: {
+    id: string;
     name: string;
   };
 };
@@ -26,7 +30,9 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDestination, setSelectedDestination] = useState("");
   const [selectedPropertyType, setSelectedPropertyType] = useState("");
-  const [priceSortOrder, setPriceSortOrder] = useState<"asc" | "desc" | "">(""); // Ny state för pris-sortering
+  const [priceSortOrder, setPriceSortOrder] = useState<"asc" | "desc" | "">("");
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null); // State för vald fastighet
+  const [isModalOpen, setIsModalOpen] = useState(false); // State för modalens synlighet
 
   useEffect(() => {
     const checkTokenExpiration = () => {
@@ -37,7 +43,12 @@ export default function Home() {
 
         if (decodedToken.exp > currentTime) {
           setIsLoggedIn(true);
-          setUserId(getLocalStorageItem("userId"));
+          const storedUserId = getLocalStorageItem("userId");
+          if (storedUserId) {
+            setUserId(storedUserId);
+          } else {
+            console.error("User ID is missing in local storage.");
+          }
         } else {
           setIsLoggedIn(false);
           setUserId(null);
@@ -64,6 +75,7 @@ export default function Home() {
           priceSortOrder: priceSortOrder || undefined,
         },
       });
+      console.log("Fetched properties:", response.data);
       setNewestProperties(response.data);
     } catch (error) {
       console.error("Failed to load properties:", error);
@@ -74,11 +86,20 @@ export default function Home() {
     fetchProperties();
   }, [searchTerm, selectedDestination, selectedPropertyType, priceSortOrder]);
 
-  // Hanteringsfunktioner för sök och filter
   const handleSearch = (term: string) => setSearchTerm(term);
   const handleDestinationTypeChange = (type: string) => setSelectedDestination(type);
   const handlePropertyTypeChange = (type: string) => setSelectedPropertyType(type);
-  const handlePriceSortChange = (order: "asc" | "desc" | "") => setPriceSortOrder(order); // Hanterare för pris-sortering
+  const handlePriceSortChange = (order: "asc" | "desc" | "") => setPriceSortOrder(order);
+
+  const handleOpenModal = (property: Property) => {
+    setSelectedProperty(property);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProperty(null);
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="relative min-h-screen flex flex-col text-white">
@@ -117,7 +138,7 @@ export default function Home() {
         onSearch={handleSearch}
         onDestinationTypeChange={handleDestinationTypeChange}
         onPropertyTypeChange={handlePropertyTypeChange}
-        onPriceSortChange={handlePriceSortChange} // Lägg till pris-sortering
+        onPriceSortChange={handlePriceSortChange}
       />
 
       {/* Newest Properties Section */}
@@ -138,9 +159,20 @@ export default function Home() {
                 <p className="text-gray-900 font-semibold mt-2">
                   Pris per natt: {property.pricePerNight} kr
                 </p>
-                {property.user && <p className="text-sm text-gray-500">Ägare: {property.user.name}</p>}
+                {property.user && (
+                  <p className="text-sm text-gray-500">
+                    Ägare:{" "}
+                    {isLoggedIn ? (
+                      <Link href={`/profile/${property.userId}`} className="text-blue-500 hover:underline">
+                        {property.user.name}
+                      </Link>
+                    ) : (
+                      property.user.name
+                    )}
+                  </p>
+                )}
                 <button
-                  onClick={() => router.push(`/property/${property.id}`)}
+                  onClick={() => handleOpenModal(property)}
                   className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg self-start"
                 >
                   Visa mer
@@ -151,10 +183,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="w-full flex gap-6 items-center justify-center py-4 bg-gray-800 text-gray-300">
-        footer
-      </footer>
+      {/* Visa mer Modal */}
+      {isModalOpen && selectedProperty && (
+        <PropertyDetail property={selectedProperty} onClose={handleCloseModal} />
+      )}
+
     </div>
   );
 }
