@@ -16,13 +16,13 @@ const AdminPage = () => {
     const [success, setSuccess] = useState('');
     const [showUsers, setShowUsers] = useState(false);
 
-    // Kontrollera om användaren är admin
+
     useEffect(() => {
         if (isAdmin === null) return; // Vänta tills värdet har laddats in
 
         console.log("Admin status:", isAdmin);
         if (isAdmin !== "true") {
-            router.push('/');  // Omdirigera om användaren inte är admin
+            router.push('/');
         }
     }, [isAdmin, router]);
 

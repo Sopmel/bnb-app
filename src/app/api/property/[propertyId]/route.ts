@@ -14,6 +14,10 @@ export async function PUT(req: NextRequest, { params }: { params: { propertyId: 
                 location: data.location,
                 pricePerNight: data.pricePerNight,
                 availability: data.availability,
+                imageUrl: data.imageUrl || null,
+                destinationType: data.destinationType || null,
+                propertyType: data.propertyType || null,
+                maxGuests: data.maxGuests ?? 1,
             },
         });
 

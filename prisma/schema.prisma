@@ -19,6 +19,23 @@ enum NotificationType {
   MESSAGE
 }
 
+enum DestinationType {
+  SUN
+  SNOW
+  BEACH
+  MOUNTAIN
+  CITY
+  COUNTRYSIDE
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  CABIN
+  VILLA
+  BUNGALOW
+}
+
 model User {
   id                String          @id @default(auto()) @map("_id") @db.ObjectId
   name              String
@@ -33,15 +50,20 @@ model User {
 }
 
 model Property {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  description   String
-  location      String
-  pricePerNight Float
-  availability  Boolean
-  bookings      Booking[] @relation("PropertyBookings")
-  user          User      @relation(fields: [userId], references: [id], name: "UserProperties", onDelete: Cascade) // flytta `onDelete: Cascade` hit
-  userId        String    @db.ObjectId
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String
+  location        String
+  pricePerNight   Float
+  availability    Boolean
+  createdAt     DateTime @default(now())
+  imageUrl        String?
+  destinationType DestinationType? 
+  propertyType    PropertyType?
+  maxGuests       Int?
+  user            User?           @relation(fields: [userId], references: [id], name: "UserProperties", onDelete: Cascade)
+  userId          String?         @db.ObjectId
+  bookings        Booking[]       @relation("PropertyBookings")
 }
 
 model Message {

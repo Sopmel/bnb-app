@@ -7,13 +7,15 @@ type Property = {
     location: string;
     pricePerNight: number;
     availability: boolean;
+    imageUrl?: string;
+    userId?: string;
 };
 
-type PropertyActionsProps = {
+interface PropertyActionsProps {
     property: Property;
     onEdit: (property: Property) => void;
     onDelete: (propertyId: string) => void;
-};
+}
 
 const PropertyActions = ({ property, onEdit, onDelete }: PropertyActionsProps) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);

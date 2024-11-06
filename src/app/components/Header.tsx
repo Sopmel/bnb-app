@@ -84,17 +84,14 @@ const Header = () => {
         try {
             const token = getLocalStorageItem('token');
 
-            // Markera som läst
             await axios.patch(`/api/notifications/${notificationId}`, null, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            // Radera notisen efter att den markerats som läst
             await axios.delete(`/api/notifications/${notificationId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            // Uppdatera notiser i state
             setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
             setUnreadCount((prev) => prev - 1);
 
@@ -103,7 +100,6 @@ const Header = () => {
             console.error("Error marking notification as read and deleting:", error);
         }
     };
-
 
     const handleLogout = () => {
         setLocalStorageItem('token', '');
@@ -120,28 +116,26 @@ const Header = () => {
     const toggleNotificationDropdown = () => setNotificationDropdownOpen(!notificationDropdownOpen);
 
     return (
-        <header className="bg-gray-800 text-white p-4">
+        <header className="bg-gray-900 text-white p-4 shadow-md sticky top-0 z-50">
             <nav className="container mx-auto flex justify-between items-center">
-                <div>
-                    <Link href="/">Airbnb</Link>
+                <div className="text-2xl font-bold">
+                    <Link href="/" className="text-yellow-400 hover:text-yellow-300 transition-colors">Airbnb</Link>
                 </div>
                 <div className="flex items-center gap-4">
                     {/* Notifikationer */}
                     {isLoggedIn && (
                         <div className="relative">
                             <button onClick={toggleNotificationDropdown} className="focus:outline-none">
-                                <i className="fas fa-bell text-2xl"></i>
+                                <i className="fas fa-bell text-xl"></i>
                                 {unreadCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
                                         {unreadCount}
                                     </span>
                                 )}
                             </button>
                             {notificationDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg p-4 z-50">
-                                    <h4 className="font-bold mb-2">Notifications</h4>
-                                    {/* Lägg till en testtext för att bekräfta att dropdownen visas */}
-                                    <p>Dropdown is open</p>
+                                <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl p-4 z-50">
+                                    <h4 className="font-bold mb-2 text-gray-700">Notifikationer</h4>
                                     <Notifications notifications={notifications} markAsRead={markAsRead} />
                                 </div>
                             )}
@@ -152,32 +146,34 @@ const Header = () => {
                     {isLoggedIn ? (
                         <div className="relative">
                             <button onClick={toggleDropdown} className="focus:outline-none">
-                                <i className="fas fa-user-circle text-3xl"></i>
+                                <i className="fas fa-user-circle text-2xl"></i>
                             </button>
                             {dropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
-                                    {userId && (
-                                        <>
-                                            <Link href={`/profile/${userId}`} onClick={() => setDropdownOpen(false)} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                                                Profile
-                                            </Link>
-                                            <Link href={`/message`} onClick={() => setDropdownOpen(false)} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                                                Messages/Bookings
-                                            </Link>
-                                        </>
-                                    )}
-                                    {isAdmin && (
-                                        <Link href="/admin" onClick={() => setDropdownOpen(false)} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Admin Panel</Link>
-                                    )}
-                                    <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</button>
+                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20">
+                                    <div className="py-2">
+                                        {userId && (
+                                            <>
+                                                <Link href={`/profile/${userId}`} onClick={() => setDropdownOpen(false)} className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                                    Profil
+                                                </Link>
+                                                <Link href="/message" onClick={() => setDropdownOpen(false)} className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                                                    Meddelanden/Bokningar
+                                                </Link>
+                                            </>
+                                        )}
+                                        {isAdmin && (
+                                            <Link href="/admin" onClick={() => setDropdownOpen(false)} className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Admin Panel</Link>
+                                        )}
+                                        <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">Logga Ut</button>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        <>
-                            <Link href="/login" className="mr-4">Log In</Link>
-                            <Link href="/register" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Register</Link>
-                        </>
+                        <div className="flex gap-4">
+                            <Link href="/login" className="text-sm font-medium text-gray-200 hover:text-white transition-colors">Logga In</Link>
+                            <Link href="/register" className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">Registrera</Link>
+                        </div>
                     )}
                 </div>
             </nav>

@@ -18,15 +18,19 @@ export async function POST(req: NextRequest) {
                 location: data.location,
                 pricePerNight: parseFloat(data.pricePerNight),
                 availability: data.availability ?? true,
+                imageUrl: data.imageUrl || null,
+                destinationType: data.destinationType || null,
+                propertyType: data.propertyType || null,
+                maxGuests: data.maxGuests || 1,
                 user: {
-                    connect: { id: data.userId },  // Koppla egendomen till användaren
+                    connect: { id: data.userId },
                 },
             },
         });
         return NextResponse.json(newProperty, { status: 201 });
     } catch (error) {
-        console.error('Error creating property:', error);
-        return NextResponse.json({ error: 'Error creating property' }, { status: 500 });
+        console.error("Error creating property:", error);
+        return NextResponse.json({ error: "Error creating property" }, { status: 500 });
     }
 }
 
@@ -35,9 +39,8 @@ export async function GET(req: NextRequest) {
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get('userId');
 
-        // Dynamiskt sätta 'where'-filtret baserat på om userId finns
         const properties = await prisma.property.findMany({
-            where: userId ? { userId: userId } : {},  // Om userId finns, inkludera det i 'where'
+            where: userId ? { userId: userId } : {},
         });
 
         return NextResponse.json(properties, { status: 200 });
@@ -46,4 +49,3 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Error fetching properties' }, { status: 500 });
     }
 }
-

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
+import useAuth from "../../hooks/useAuth";
 
 import PropertyPage from '../../components/PropertyPage';
 import PropertyCreateForm from '@/app/components/PropertyCreateForm';
@@ -10,6 +11,8 @@ import MessageButton from '@/app/components/MessageButton';
 import { getLocalStorageItem, setLocalStorageItem } from '../../utils/localStorageUtil';
 
 const Profile = () => {
+
+
     const { userId: userIdParam } = useParams(); // Hämta ID från URL
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);

@@ -1,5 +1,8 @@
 import React from 'react';
 
+const destinationTypes = ["SUN", "SNOW", "BEACH", "MOUNTAIN", "CITY", "COUNTRYSIDE"];
+const propertyTypes = ["APARTMENT", "HOUSE", "CABIN", "VILLA", "BUNGALOW"];
+
 type Property = {
     id: string;
     name: string;
@@ -7,6 +10,10 @@ type Property = {
     location: string;
     pricePerNight: number;
     availability: boolean;
+    imageUrl?: string;
+    destinationType?: string;
+    propertyType?: string;
+    maxGuests?: number;
 };
 
 type EditPropertyModalProps = {
@@ -22,6 +29,10 @@ const PropertyEditModal = ({ property, onClose, onSubmit }: EditPropertyModalPro
         location: property?.location || '',
         pricePerNight: property?.pricePerNight || 0,
         availability: property?.availability || true,
+        imageUrl: property?.imageUrl || '',
+        destinationType: property?.destinationType || '',
+        propertyType: property?.propertyType || '',
+        maxGuests: property?.maxGuests || 1,
     });
 
     if (!property) return null;
@@ -79,6 +90,40 @@ const PropertyEditModal = ({ property, onClose, onSubmit }: EditPropertyModalPro
                         placeholder="Price per Night"
                         value={editProperty.pricePerNight}
                         onChange={(e) => setEditProperty({ ...editProperty, pricePerNight: parseFloat(e.target.value) })}
+                        style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Image URL"
+                        value={editProperty.imageUrl}
+                        onChange={(e) => setEditProperty({ ...editProperty, imageUrl: e.target.value })}
+                        style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                    <select
+                        value={editProperty.destinationType}
+                        onChange={(e) => setEditProperty({ ...editProperty, destinationType: e.target.value })}
+                        style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    >
+                        <option value="" disabled>Select Destination Type</option>
+                        {destinationTypes.map((type) => (
+                            <option key={type} value={type}>{type}</option>
+                        ))}
+                    </select>
+                    <select
+                        value={editProperty.propertyType}
+                        onChange={(e) => setEditProperty({ ...editProperty, propertyType: e.target.value })}
+                        style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+                    >
+                        <option value="" disabled>Select Property Type</option>
+                        {propertyTypes.map((type) => (
+                            <option key={type} value={type}>{type}</option>
+                        ))}
+                    </select>
+                    <input
+                        type="number"
+                        placeholder="Max Guests"
+                        value={editProperty.maxGuests}
+                        onChange={(e) => setEditProperty({ ...editProperty, maxGuests: parseInt(e.target.value) })}
                         style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
                     />
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>

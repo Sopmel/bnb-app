@@ -8,6 +8,10 @@ type Property = {
     location: string;
     pricePerNight: number;
     availability: boolean;
+    imageUrl?: string;
+    destinationType?: string;
+    propertyType?: string;
+    maxGuests?: number;
 };
 
 export default function PropertyCreateForm({ onCreate }: { onCreate: () => void }) {
@@ -17,6 +21,10 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
         location: '',
         pricePerNight: 0,
         availability: true,
+        imageUrl: '',
+        destinationType: '',
+        propertyType: '',
+        maxGuests: 1,
     };
     const [properties, setProperties] = useState<Property[]>([]);
     const [newProperty, setNewProperty] = useState<Omit<Property, 'id'>>(initialPropertyState);
@@ -25,7 +33,6 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
         e.preventDefault();
 
         const userId = getLocalStorageItem('userId');
-
         if (!userId) {
             console.error("User ID is required to create a property.");
             return;
@@ -36,7 +43,7 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 ...newProperty,
-                userId,  // Skicka med userId
+                userId, // Send along userId
             }),
         });
 
@@ -49,14 +56,14 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
         console.log('Property created:', data);
 
         onCreate();
-
         setNewProperty(initialPropertyState);
 
-        // Hämta och visa alla egendomar igen efter att en ny har skapats
+        // Reload properties after a new one is created
         fetch(`/api/property?userId=${userId}`)
             .then((res) => res.json())
             .then((data) => setProperties(data));
     };
+
     return (
         <>
             <h2>Create New Property</h2>
@@ -91,6 +98,42 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
                     onChange={(e) => setNewProperty({ ...newProperty, pricePerNight: parseFloat(e.target.value) })}
                     style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
                 />
+                <input
+                    type="text"
+                    placeholder="Image URL"
+                    value={newProperty.imageUrl}
+                    onChange={(e) => setNewProperty({ ...newProperty, imageUrl: e.target.value })}
+                    style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+                />
+                <select
+                    value={newProperty.destinationType}
+                    onChange={(e) => setNewProperty({ ...newProperty, destinationType: e.target.value })}
+                    style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+                >
+                    <option value="">Select Destination Type</option>
+                    <option value="BEACH">Beach</option>
+                    <option value="MOUNTAIN">Mountain</option>
+                    <option value="CITY">City</option>
+                    <option value="COUNTRYSIDE">Countryside</option>
+                </select>
+                <select
+                    value={newProperty.propertyType}
+                    onChange={(e) => setNewProperty({ ...newProperty, propertyType: e.target.value })}
+                    style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+                >
+                    <option value="">Select Property Type</option>
+                    <option value="APARTMENT">Apartment</option>
+                    <option value="VILLA">Villa</option>
+                    <option value="CABIN">Cabin</option>
+                    <option value="HOTEL">Hotel</option>
+                </select>
+                <input
+                    type="number"
+                    placeholder="Max Guests"
+                    value={newProperty.maxGuests}
+                    onChange={(e) => setNewProperty({ ...newProperty, maxGuests: parseInt(e.target.value, 10) })}
+                    style={{ padding: '8px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
+                />
                 <button type="submit" style={{
                     padding: '10px',
                     fontSize: '16px',
@@ -102,5 +145,5 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
                 }}>Create Property</button>
             </form>
         </>
-    )
+    );
 }
