@@ -10,6 +10,12 @@ export async function POST(req: NextRequest) {
         const { userId, message, type, bookingId, messageId }:
             { userId: string; message: string; type: NotificationType; bookingId?: string; messageId?: string } = await req.json();
 
+        console.log("Received userId in backend:", userId);
+
+        if (!userId) {
+            throw new Error("userId is undefined"); // Lägg till ett explicit fel om userId saknas
+        }
+
         const notificationData = {
             userId,
             message,

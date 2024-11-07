@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getLocalStorageItem } from '../utils/localStorageUtil';
+import { createNotification } from '../utils/notificationHelper';
 
 type Booking = {
     id: string;
@@ -54,17 +55,42 @@ const UserBookings = ({ userId }: { userId: string }) => {
                 return;
             }
 
+            // Hämta bokningsinformationen för att få fastighetsägarens ID
+            const bookingResponse = await axios.get(`/api/bookings/oneBooking/${bookingId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const booking = bookingResponse.data;
+
+            if (!booking.property?.user?.id) {
+                console.error("Property owner ID is missing from the booking data.");
+                alert("Unable to retrieve property owner information.");
+                return;
+            }
+
+            // Avbryt bokningen
             const response = await axios.delete(`/api/bookings/cancel/${bookingId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
             alert(response.data.message);
+
+            // Uppdatera listan i frontend genom att ta bort den avbokade bokningen
             setUserBookings(prevBookings => prevBookings.filter(b => b.id !== bookingId));
+
+            // Skicka notifikation till fastighetsägaren
+            await createNotification(
+                booking.property.user.id, // Fastighetsägarens ID
+                `A booking for your property has been cancelled.`,
+                "DECLINED",
+                bookingId
+            );
         } catch (error) {
             console.error("Error cancelling booking:", error);
             alert("Error cancelling booking");
         }
     };
+
+
 
     const statusColors = {
         PENDING: 'bg-yellow-300 text-yellow-800',

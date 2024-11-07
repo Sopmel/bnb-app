@@ -3,6 +3,7 @@ import axios from 'axios';
 import UserBookings from './UserBookings';
 import BookingRequests from './BookingRequests';
 import { getLocalStorageItem } from '../utils/localStorageUtil';
+import { createNotification } from '../utils/notificationHelper';
 
 type BookedProperty = {
     id: string;
@@ -13,13 +14,32 @@ type BookedProperty = {
         imageUrl?: string;
         pricePerNight: number;
         user: {
+            id: string;
             name: string;
             email: string;
         };
     };
     user: {
+        id: string;
         name: string;
         email: string;
+    };
+    checkInDate: string;
+    checkOutDate: string;
+    totalPrice: number;
+    status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'CANCELLED';
+};
+
+type Booking = {
+    id: string;
+    property: {
+        name: string;
+        location: string;
+        imageUrl?: string;
+        user: {
+            name: string;
+            email: string;
+        };
     };
     checkInDate: string;
     checkOutDate: string;
@@ -32,6 +52,7 @@ type BookedProperty = {
 const Bookings = ({ userId }: { userId: string }) => {
     const [bookedProperties, setBookedProperties] = useState<BookedProperty[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [userBookings, setUserBookings] = useState<Booking[]>([]);
 
     useEffect(() => {
         const fetchBookedProperties = async () => {
@@ -59,22 +80,42 @@ const Bookings = ({ userId }: { userId: string }) => {
         try {
             const token = getLocalStorageItem("token");
             if (!token) {
-                alert("You need to be logged in to cancel a booking.");
+                alert("Please log in to cancel the booking.");
                 return;
             }
 
-            await axios.delete(`/api/bookings/cancel/${bookingId}`, {
-                headers: { Authorization: `Bearer ${token}` },
+            // Hämta bokningsinformationen för att få fastighetsägarens ID
+            const bookingResponse = await axios.get(`/api/bookings/oneBooking/${bookingId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const booking = bookingResponse.data;
+
+            if (!booking.property?.user?.id) {
+                console.error("Property owner ID is missing from the booking data.");
+                alert("Unable to retrieve property owner information.");
+                return;
+            }
+
+            // Avbryt bokningen
+            const response = await axios.delete(`/api/bookings/cancel/${bookingId}`, {
+                headers: { Authorization: `Bearer ${token}` }
             });
 
-            setBookedProperties(prevProperties =>
-                prevProperties.filter(property => property.id !== bookingId)
-            );
+            alert(response.data.message);
 
-            alert("Booking has been cancelled.");
+            // Uppdatera listan i frontend genom att ta bort den avbokade bokningen
+            setUserBookings(prevBookings => prevBookings.filter(b => b.id !== bookingId));
+
+            // Skicka notifikation till fastighetsägaren
+            await createNotification(
+                booking.property.user.id, // Fastighetsägarens ID
+                `A booking for your property has been cancelled.`,
+                "DECLINED",
+                bookingId
+            );
         } catch (error) {
-            setError("Failed to cancel the booking.");
             console.error("Error cancelling booking:", error);
+            alert("Error cancelling booking");
         }
     };
 
@@ -133,7 +174,6 @@ const Bookings = ({ userId }: { userId: string }) => {
                                 </div>
                             </li>
                         ))}
-
                     </ul>
                 )}
             </section>
