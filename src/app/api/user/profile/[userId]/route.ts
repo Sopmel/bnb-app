@@ -3,22 +3,22 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
-
+// userid i url, params
 export async function GET(req: NextRequest, { params }: { params: { userId: string } }) {
     const authorizationHeader = req.headers.get('authorization');
 
-    // Kontrollera att Authorization-headern finns
+    // Kontrollera auth finns i header
     if (!authorizationHeader) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-
+    // tar ut token från headern
     const token = authorizationHeader.split(' ')[1];
 
     try {
         // Verifiera JWT-token
         jwt.verify(token, process.env.JWT_SECRET!);
 
-        // Kontrollera att userId skickas korrekt från URL-parametrarna
+
         const { userId } = params;
         if (!userId || userId === 'null') {
             return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
@@ -31,12 +31,11 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
             },
         });
 
-        // Kontrollera om användaren finns
+
         if (!user) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 });
         }
 
-        // Returnera användardata
         return NextResponse.json({
             id: user.id,
             name: user.name,
@@ -44,7 +43,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
             isAdmin: user.isAdmin,
         }, { status: 200 });
     } catch (error) {
-        // Specifik hantering av JWT-fel
+
         if (error instanceof jwt.JsonWebTokenError) {
             return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
         } else if (error instanceof jwt.TokenExpiredError) {

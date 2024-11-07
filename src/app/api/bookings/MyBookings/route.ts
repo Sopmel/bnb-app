@@ -8,6 +8,7 @@ export async function GET(req: NextRequest) {
     try {
         // Hämta token från headers
         const token = req.headers.get("Authorization")?.split(" ")[1];
+
         const decodedToken = token ? jwt.verify(token, process.env.JWT_SECRET!) : null;
         const userId = decodedToken ? (decodedToken as { userId: string }).userId : null;
 
@@ -18,11 +19,11 @@ export async function GET(req: NextRequest) {
         // Hämta bokningar där användaren är gästen
         const userBookings = await prisma.booking.findMany({
             where: {
-                userId: userId,  // Här är användaren gästen
-                status: "APPROVED",  // Hämtar endast godkända bokningar
+                userId: userId,
+                status: "APPROVED",
             },
             include: {
-                property: true,  // Inkluderar egendomsinformation
+                property: true,
             }
         });
 

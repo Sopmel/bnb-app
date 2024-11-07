@@ -5,10 +5,14 @@ import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest, { params }: { params: { bookingId: string } }) {
+    // Hämta bookingId från params
     const { bookingId } = params;
 
     try {
+        //separerar token från headers och verifierar token
         const token = req.headers.get("Authorization")?.split(" ")[1];
+
+        //dekodar token och hämtar userId
         const decodedToken = token ? jwt.verify(token, process.env.JWT_SECRET!) : null;
         const userId = decodedToken ? (decodedToken as { userId: string }).userId : null;
 

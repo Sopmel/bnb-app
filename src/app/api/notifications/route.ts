@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     try {
+        // hämta info från request body
         const { userId, message, type, bookingId, messageId }:
             { userId: string; message: string; type: NotificationType; bookingId?: string; messageId?: string } = await req.json();
 
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
             message,
             type,
             read: false,
-            ...(bookingId && { bookingId }),
+            ...(bookingId && { bookingId }), // om finns inkludera
             ...(messageId && { messageId })
         };
 
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     try {
         const token = req.headers.get("Authorization")?.split(" ")[1];
+
         const decodedToken = token ? jwt.verify(token, process.env.JWT_SECRET!) : null;
         const userId = decodedToken ? (decodedToken as { userId: string }).userId : null;
 
@@ -43,6 +45,7 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
         }
 
+        // hämta notiser för användaren, sortera nyast först
         const notifications = await prisma.notification.findMany({
             where: { userId },
             include: {

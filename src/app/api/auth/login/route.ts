@@ -8,8 +8,10 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(req: NextRequest) {
     try {
+        //separerar email och password från request body
         const { email, password } = await req.json();
 
+        //letar efter användaren i databasen
         const user = await prisma.user.findUnique({
             where: { email },
         });
@@ -18,6 +20,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: 'User not found' }, { status: 400 });
         }
 
+        // Jämför lösenord
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return NextResponse.json({ message: 'Wrong email or password' }, { status: 400 });
@@ -25,7 +28,7 @@ export async function POST(req: NextRequest) {
 
 
         if (!JWT_SECRET) {
-            throw new Error('JWT_SECRET är inte definierad i miljövariabler');
+            throw new Error('JWT_SECRET är inte definierad');
         }
 
         // Skapa JWT-token
@@ -35,7 +38,7 @@ export async function POST(req: NextRequest) {
             { expiresIn: '1h' }
         );
 
-        // Returnera token och användarinformation
+        // Returnera token och användarinfo
         return NextResponse.json({ token, user }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: 'An error occurred', error }, { status: 500 });

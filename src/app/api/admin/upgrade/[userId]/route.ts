@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
                 id: userId,
             },
             data: {
-                isAdmin: action === 'upgrade', // True om upgrade, annars false
+                isAdmin: action === 'upgrade',
             },
         });
 

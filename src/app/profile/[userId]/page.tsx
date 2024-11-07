@@ -11,8 +11,6 @@ import MessageButton from '@/app/components/MessageButton';
 import { getLocalStorageItem, setLocalStorageItem } from '../../utils/localStorageUtil';
 
 const Profile = () => {
-
-
     const { userId: userIdParam } = useParams(); // Hämta ID från URL
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -62,7 +60,7 @@ const Profile = () => {
     if (!user) return <p>Loading profile...</p>;
 
     const refreshProperties = () => {
-        setUpdateProperties((prev) => !prev); // Ladda om PropertyPage-komponenten
+        setUpdateProperties((prev) => !prev); // Ladda om PropertyPage
     };
 
     const navigateToMessages = () => {

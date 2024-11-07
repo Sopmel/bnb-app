@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
     try {
-        // Hämta alla användare och välj specifika fält
+        // Hämta alla användare
         const users = await prisma.user.findMany({
             select: {
                 id: true,

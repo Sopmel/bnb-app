@@ -6,12 +6,14 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     try {
+        // hämta info från request body
         const { senderId, receiverId, content } = await req.json();
 
         if (!senderId || !receiverId || !content) {
             return NextResponse.json({ error: "Sender ID, Receiver ID and Content is required" }, { status: 400 });
         }
 
+        //skapa meddelande
         const newMessage = await prisma.message.create({
             data: {
                 senderId,
@@ -29,6 +31,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     try {
+        // hämta relevanta users från query params
         const { searchParams } = new URL(req.url);
         const userId1 = searchParams.get('userId1');
         const userId2 = searchParams.get('userId2');
@@ -37,6 +40,7 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Both userId1 and userId2 are required" }, { status: 400 });
         }
 
+        //hämta meddelanden där antingen userId1 är avsändare och userId2 mottagare, eller tvärt om
         const messages = await prisma.message.findMany({
             where: {
                 OR: [

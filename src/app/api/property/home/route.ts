@@ -12,6 +12,7 @@ export async function GET(req: Request) {
 
         const properties = await prisma.property.findMany({
             where: {
+                // letar i namn och desc för att matcha sökord
                 ...(search
                     ? {
                         OR: [

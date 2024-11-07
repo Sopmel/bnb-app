@@ -5,7 +5,10 @@ const prisma = new PrismaClient();
 
 export async function PUT(req: NextRequest, { params }: { params: { propertyId: string } }) {
     try {
+        // hämta uppdaterad info från request body
         const data = await req.json();
+
+        // uppdatera property i databasen, hittar med id från params
         const updatedProperty = await prisma.property.update({
             where: { id: params.propertyId },
             data: {

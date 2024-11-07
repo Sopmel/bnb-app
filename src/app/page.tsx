@@ -35,6 +35,7 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false); // State för modalens synlighet
 
   useEffect(() => {
+    //hämtar token från local storage och kollar om det är giltigt
     const checkTokenExpiration = () => {
       const token = getLocalStorageItem("token");
       if (token) {

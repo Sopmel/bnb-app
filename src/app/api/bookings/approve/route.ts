@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     try {
+        // hämta bookingId från request body
         const { bookingId }: { bookingId: string } = await req.json();
 
         const booking = await prisma.booking.update({

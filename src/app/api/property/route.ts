@@ -5,12 +5,13 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     try {
+        // info om property och userId från request body
         const data = await req.json();
 
         if (!data.userId) {
             return NextResponse.json({ error: "User ID is required" }, { status: 400 });
         }
-
+        // Skapa ny property med koppling till användaren
         const newProperty = await prisma.property.create({
             data: {
                 name: data.name,
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     try {
+        // Hämta userId från url
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get('userId');
 

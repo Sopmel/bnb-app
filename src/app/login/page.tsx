@@ -31,7 +31,7 @@ const Login = () => {
                 // Dekodera JWT-token
                 const decodedToken: any = decodeJWT(token);
 
-                // Hämta isAdmin från den dekoderade tokenen
+                // Hämta isAdmin, userId från den dekoderade tokenen
                 const isAdmin = decodedToken.isAdmin;
 
                 const userId = decodedToken.userId;
@@ -41,7 +41,8 @@ const Login = () => {
                 setLocalStorageItem('isAdmin', isAdmin ? 'true' : 'false');
                 setLocalStorageItem('userId', userId);
 
-                window.dispatchEvent(new Event('login'));  // Trigga login-event
+                // Trigga login-event
+                window.dispatchEvent(new Event('login'));
                 router.push('/');
             }
         } catch (err) {

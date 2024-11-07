@@ -8,7 +8,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
         const { userId } = params;
         const messages = await prisma.message.findMany({
             where: { senderId: userId },
-            include: { receiver: true },  // Inkludera mottagarens info
+            include: { receiver: true },
         });
 
         return NextResponse.json(messages, { status: 200 });

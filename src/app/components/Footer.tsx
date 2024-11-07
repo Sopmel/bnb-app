@@ -8,7 +8,6 @@ export default function Footer() {
         <footer className="bg-gray-800 text-gray-300 py-10">
             <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
 
-                {/* About Section */}
                 <div>
                     <h2 className="text-lg font-semibold mb-4">Om Oss</h2>
                     <p className="text-sm text-gray-400">
@@ -16,7 +15,6 @@ export default function Footer() {
                     </p>
                 </div>
 
-                {/* Quick Links */}
                 <div>
                     <h2 className="text-lg font-semibold mb-4">Snabblänkar</h2>
                     <ul className="space-y-2">
@@ -35,7 +33,7 @@ export default function Footer() {
                     </ul>
                 </div>
 
-                {/* Social Media */}
+
                 <div>
                     <h2 className="text-lg font-semibold mb-4">Följ Oss</h2>
                     <div className="flex space-x-4 text-2xl">
@@ -53,11 +51,6 @@ export default function Footer() {
                         </Link>
                     </div>
                 </div>
-            </div>
-
-            {/* Copyright */}
-            <div className="mt-8 text-center text-gray-500 text-sm">
-                &copy; {new Date().getFullYear()} Airbnb Clone. Alla rättigheter förbehållna.
             </div>
         </footer>
     );

@@ -43,7 +43,7 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 ...newProperty,
-                userId, // Send along userId
+                userId,
             }),
         });
 
@@ -58,7 +58,7 @@ export default function PropertyCreateForm({ onCreate }: { onCreate: () => void 
         onCreate();
         setNewProperty(initialPropertyState);
 
-        // Reload properties after a new one is created
+        // Reload properties 
         fetch(`/api/property?userId=${userId}`)
             .then((res) => res.json())
             .then((data) => setProperties(data));

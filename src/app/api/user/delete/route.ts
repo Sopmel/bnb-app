@@ -14,10 +14,11 @@ export async function DELETE(req: NextRequest) {
     const token = authorizationHeader.split(' ')[1];
 
     try {
+        // dekryptera token, hämta userId
         const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET!);
-        const userId = decodedToken.userId; // Justera om du använder 'UserId' istället
+        const userId = decodedToken.userId;
 
-        // Radera användaren från databasen baserat på userId
+        // Radera användaren basterat på userId
         await prisma.user.delete({
             where: {
                 id: userId,

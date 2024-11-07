@@ -6,9 +6,10 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     try {
+        // nödvändig data från request body
         const { propertyId, startDate, endDate }: { propertyId: string; startDate: string; endDate: string } = await req.json();
 
-        // Hämta egendomsdata inklusive ägaren (userId)
+        // Hämta data om egendom och ägaren (userId)
         const property = await prisma.property.findUnique({
             where: { id: propertyId },
             select: { userId: true, pricePerNight: true },
@@ -22,8 +23,8 @@ export async function POST(req: NextRequest) {
         const nights = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));
         const cost = nights * property.pricePerNight;
 
-        // Extrahera userId från token för att säkerställa att användaren är autentiserad
         const token = req.headers.get("Authorization")?.split(" ")[1];
+
         const decodedToken = token ? jwt.verify(token, process.env.JWT_SECRET!) : null;
         const userId = decodedToken ? (decodedToken as { userId: string }).userId : null;
 
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
         }
 
-        // Skapa bokningsförfrågan
+        // Skapa bokning
         const booking = await prisma.booking.create({
             data: {
                 propertyId,
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        // Skicka tillbaka både boknings-ID och ägarens ID (ownerId) till frontend
+        //skickar bookningsid ownerid och kostnad tillbaka
         return NextResponse.json({ cost, bookingId: booking.id, ownerId: property.userId }, { status: 201 });
     } catch (error) {
         console.error("Error creating booking:", error);
@@ -53,8 +54,8 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
     try {
-
         const token = req.headers.get("Authorization")?.split(" ")[1];
+
         const decodedToken = token ? jwt.verify(token, process.env.JWT_SECRET!) : null;
         const userId = decodedToken ? (decodedToken as { userId: string }).userId : null;
 

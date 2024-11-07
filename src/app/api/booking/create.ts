@@ -5,13 +5,15 @@ const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
+        //separera nödvändig info från request body
         const { checkInDate, checkOutDate, userId, propertyId } = req.body;
 
-        // Beräkna antalet nätter och totalpris
+        // Gör till date-obj, Beräkna antalet nätter
         const checkIn = new Date(checkInDate);
         const checkOut = new Date(checkOutDate);
         const nights = (checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24);
 
+        // hitta property med id, räkna ut pris
         const property = await prisma.property.findUnique({
             where: { id: propertyId },
         });

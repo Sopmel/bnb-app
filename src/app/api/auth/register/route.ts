@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     try {
+        //separerar info från request body
         const { name, email, password, isAdmin } = await req.json();
 
         // Kontrollera om användaren redan finns
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: 'User already exists' }, { status: 400 });
         }
 
-        // Hasha lösenordet
+        // Hasha lösenordet med salt 10 (gör att det blir svårare att dekryptera)
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Skapa ny användare

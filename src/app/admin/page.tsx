@@ -27,10 +27,10 @@ const AdminPage = () => {
     }, [isAdmin, router]);
 
 
-    // Hämta alla användare från backend när sidan laddas
+    // Hämta alla användare
     useEffect(() => {
         const fetchUsers = async () => {
-            const token = getLocalStorageItem("token"); // Använd `getLocalStorageItem` för att hämta token
+            const token = getLocalStorageItem("token");
             if (!token) {
                 setError("Ingen giltig token hittad.");
                 return;
