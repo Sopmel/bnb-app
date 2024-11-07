@@ -102,6 +102,8 @@ export default function Home() {
     setIsModalOpen(false);
   };
 
+  const isFilteringOrSorting = searchTerm || selectedDestination || selectedPropertyType || priceSortOrder;
+
   return (
     <div className="relative min-h-screen flex flex-col text-white">
       {/* Hero Section */}
@@ -143,9 +145,11 @@ export default function Home() {
       />
 
       {/* Newest Properties Section */}
-      <section className="flex flex-col items-center py-16 px-8 bg-gray-100 text-gray-900">
-        <h2 className="text-3xl font-semibold mb-8">Nyaste tillagda boenden</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-5xl">
+      <section className="flex flex-col items-center py-16 px-4 bg-gray-100 text-gray-900">
+        {!isFilteringOrSorting && (
+          <h2 className="text-3xl font-semibold mb-8">Nyaste tillagda boenden</h2>
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-screen-xl">
           {newestProperties.map((property) => (
             <div
               key={property.id}
@@ -188,7 +192,6 @@ export default function Home() {
       {isModalOpen && selectedProperty && (
         <PropertyDetail property={selectedProperty} onClose={handleCloseModal} />
       )}
-
     </div>
   );
 }

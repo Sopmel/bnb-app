@@ -9,6 +9,7 @@ export async function GET(req: Request) {
         const search = url.searchParams.get("search");
         const destinationType = url.searchParams.get("destinationType");
         const propertyType = url.searchParams.get("propertyType");
+        const priceSortOrder = url.searchParams.get("priceSortOrder");
 
         const properties = await prisma.property.findMany({
             where: {
@@ -27,7 +28,9 @@ export async function GET(req: Request) {
             include: {
                 user: { select: { name: true } },
             },
-            orderBy: { createdAt: "desc" },
+            orderBy: priceSortOrder
+                ? { pricePerNight: priceSortOrder === "asc" ? "asc" : "desc" }
+                : { createdAt: "desc" }, // fallback till createdAt om ingen sortering är specificerad
         });
 
         return NextResponse.json(properties);

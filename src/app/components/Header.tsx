@@ -111,9 +111,15 @@ const Header = () => {
         router.push('/login');
     };
 
-    const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+    const toggleDropdown = () => {
+        setDropdownOpen(!dropdownOpen);
+        if (!dropdownOpen) setNotificationDropdownOpen(false); // Stänger notification-dropdown om profil-dropdown öppnas
+    };
 
-    const toggleNotificationDropdown = () => setNotificationDropdownOpen(!notificationDropdownOpen);
+    const toggleNotificationDropdown = () => {
+        setNotificationDropdownOpen(!notificationDropdownOpen);
+        if (!notificationDropdownOpen) setDropdownOpen(false); // Stänger profil-dropdown om notification-dropdown öppnas
+    };
 
     return (
         <header className="bg-gray-900 text-white p-4 shadow-md sticky top-0 z-50">
