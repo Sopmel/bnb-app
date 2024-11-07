@@ -32,9 +32,22 @@ const BookingForm = ({ propertyId, pricePerNight, onTotalCostUpdate }: { propert
                 return;
             }
 
-            await axios.post(`/api/bookings/request`, { propertyId, startDate, endDate }, {
+            // Skicka bokningsförfrågan
+            const bookingResponse = await axios.post(`/api/bookings/request`, { propertyId, startDate, endDate }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+
+            // Skapa notifikation efter att bokningsförfrågan har skickats
+            await axios.post(
+                `/api/notifications`,
+                {
+                    userId: bookingResponse.data.ownerId, // användar-ID för fastighetsägaren
+                    message: `You have a new booking request for your property.`,
+                    type: "BOOKING_REQUEST",
+                    bookingId: bookingResponse.data.bookingId, // boknings-ID för notifikation
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
             alert("Booking request sent!");
         } catch (error) {
@@ -44,6 +57,7 @@ const BookingForm = ({ propertyId, pricePerNight, onTotalCostUpdate }: { propert
             setIsSubmitting(false);
         }
     };
+
 
     return (
         <div className="p-6 bg-gray-50 rounded-lg shadow-md max-w-md w-full mx-auto">

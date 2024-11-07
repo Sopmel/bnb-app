@@ -17,6 +17,8 @@ enum BookingStatus {
 enum NotificationType {
   BOOKING_REQUEST
   MESSAGE
+  APPROVED
+  DECLINED
 }
 
 enum DestinationType {

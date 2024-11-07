@@ -1,5 +1,5 @@
 import './globals.css';
-import Header from './components/Header';  // Importera Header-komponenten
+import Header from './components/Header';
 import Footer from './components/Footer';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -11,9 +11,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
         />
       </head>
-      <body>
+      <body className="flex flex-col min-h-screen">
         <Header />
-        {children}
+
+        {/* Main content area with flex-grow to fill available space */}
+        <main className="flex-grow">
+          {children}
+        </main>
+
         <Footer />
       </body>
     </html>

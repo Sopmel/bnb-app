@@ -1,4 +1,3 @@
-// /api/bookings/bookedProperties.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
@@ -15,15 +14,35 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
         }
 
+        // Hämta bokningar med detaljerad information om egendom och användare
         const bookedProperties = await prisma.booking.findMany({
             where: {
                 property: {
-                    userId: userId
+                    userId: userId,
                 },
                 status: "APPROVED",
             },
             include: {
-                property: true,
+                property: {
+                    select: {
+                        name: true,
+                        location: true,
+                        imageUrl: true,
+                        pricePerNight: true,
+                        user: {
+                            select: {
+                                name: true,
+                                email: true
+                            }
+                        }
+                    }
+                },
+                user: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
+                }
             }
         });
 

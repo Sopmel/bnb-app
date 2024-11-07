@@ -23,23 +23,32 @@ const MessagesList = ({ userId }: MessagesListProps) => {
     const [activeTab, setActiveTab] = useState<'received' | 'sent' | 'bookings'>('received');
     const [replyContent, setReplyContent] = useState('');
     const [showReplyInput, setShowReplyInput] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     const router = useRouter();
 
     useEffect(() => {
+        if (!userId) return;
+
         const fetchMessages = async () => {
             try {
                 const received = await axios.get(`/api/messages/${userId}/received`);
                 const sent = await axios.get(`/api/messages/${userId}/sent`);
                 setReceivedMessages(received.data);
                 setSentMessages(sent.data);
+                setIsLoading(false);
             } catch (error) {
                 console.error("Failed to load messages:", error);
+                setIsLoading(false);
             }
         };
 
         fetchMessages();
     }, [userId]);
+
+    if (isLoading) {
+        return <p>Loading messages...</p>;
+    }
 
     const handleViewProfile = (profileUserId: string) => {
         router.push(`/profile/${profileUserId}`);

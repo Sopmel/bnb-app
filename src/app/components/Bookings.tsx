@@ -6,13 +6,28 @@ import { getLocalStorageItem } from '../utils/localStorageUtil';
 
 type BookedProperty = {
     id: string;
-    name: string;
-    location: string;
+    property: {
+        id: string;
+        name: string;
+        location: string;
+        imageUrl?: string;
+        pricePerNight: number;
+        user: {
+            name: string;
+            email: string;
+        };
+    };
+    user: {
+        name: string;
+        email: string;
+    };
     checkInDate: string;
     checkOutDate: string;
     totalPrice: number;
-    status: 'PENDING' | 'APPROVED' | 'DECLINED';
+    status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'CANCELLED';
 };
+
+
 
 const Bookings = ({ userId }: { userId: string }) => {
     const [bookedProperties, setBookedProperties] = useState<BookedProperty[]>([]);
@@ -40,70 +55,95 @@ const Bookings = ({ userId }: { userId: string }) => {
         fetchBookedProperties();
     }, [userId]);
 
-    return (
-        <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '1.8rem', marginBottom: '20px' }}>Bookings Overview</h2>
-            {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+    const handleCancelBooking = async (bookingId: string) => {
+        try {
+            const token = getLocalStorageItem("token");
+            if (!token) {
+                alert("You need to be logged in to cancel a booking.");
+                return;
+            }
 
-            <section style={{ marginBottom: '30px' }}>
-                <h3 style={{ fontSize: '1.5rem', borderBottom: '2px solid #ccc', paddingBottom: '5px', marginBottom: '15px' }}>
-                    My Booked Travels
-                </h3>
+            await axios.delete(`/api/bookings/cancel/${bookingId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setBookedProperties(prevProperties =>
+                prevProperties.filter(property => property.id !== bookingId)
+            );
+
+            alert("Booking has been cancelled.");
+        } catch (error) {
+            setError("Failed to cancel the booking.");
+            console.error("Error cancelling booking:", error);
+        }
+    };
+
+    const statusColors = {
+        PENDING: 'bg-yellow-300 text-yellow-800',
+        APPROVED: 'bg-green-300 text-green-800',
+        DECLINED: 'bg-red-300 text-red-800',
+        CANCELLED: 'bg-gray-300 text-gray-800'
+    };
+
+    return (
+        <div className="p-6 bg-gray-50 rounded-lg shadow-lg max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Bookings Overview</h2>
+            {error && <p className="text-red-500 text-center">{error}</p>}
+
+            <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-4">My Booked Travels</h3>
                 <UserBookings userId={userId} />
             </section>
 
-            <section style={{ marginBottom: '30px' }}>
-                <h3 style={{ fontSize: '1.5rem', borderBottom: '2px solid #ccc', paddingBottom: '5px', marginBottom: '15px' }}>
-                    My Booked Properties
-                </h3>
-                <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {bookedProperties.length > 0 ? bookedProperties.map(property => (
-                        <li key={property.id} style={cardStyle}>
-                            <p style={propertyTextStyle}><strong>Property:</strong> {property.name}</p>
-                            <p style={propertyTextStyle}><strong>Location:</strong> {property.location}</p>
-                            <p style={propertyTextStyle}><strong>Check-In:</strong> {new Date(property.checkInDate).toLocaleDateString()}</p>
-                            <p style={propertyTextStyle}><strong>Check-Out:</strong> {new Date(property.checkOutDate).toLocaleDateString()}</p>
-                            <p style={propertyTextStyle}><strong>Total Price:</strong> {property.totalPrice} SEK</p>
-                            <p style={{ ...propertyTextStyle, color: statusColors[property.status] }}>
-                                <strong>Status:</strong> {property.status}
-                            </p>
-                        </li>
-                    )) : (
-                        <p>No booked properties found.</p>
-                    )}
-                </ul>
+            <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-4">My Booked Properties</h3>
+                {bookedProperties.length === 0 ? (
+                    <p className="text-center text-gray-600">No booked properties found.</p>
+                ) : (
+                    <ul className="space-y-4">
+                        {bookedProperties.map((property) => (
+                            <li key={property.id} className="p-4 rounded-lg shadow-md flex flex-col sm:flex-row bg-white overflow-hidden">
+                                {property.property.imageUrl && (
+                                    <img
+                                        src={property.property.imageUrl}
+                                        alt={property.property.name}
+                                        className="w-full sm:w-1/3 h-48 object-cover"
+                                    />
+                                )}
+                                <div className="flex-1 p-4">
+                                    <p className="text-lg font-semibold">{property.property.name}</p>
+                                    <p className="text-sm text-gray-600">{property.property.location}</p>
+                                    <p className="text-sm text-gray-500">Booked by: {property.user.name} ({property.user.email})</p>
+                                    <p className="mt-2"><strong>Check-In:</strong> {new Date(property.checkInDate).toLocaleDateString()}</p>
+                                    <p><strong>Check-Out:</strong> {new Date(property.checkOutDate).toLocaleDateString()}</p>
+                                    <p><strong>Total Price:</strong> {property.totalPrice} SEK</p>
+                                </div>
+                                <div className="p-4 flex flex-col items-center justify-between">
+                                    <span className={`px-3 py-1 rounded-full font-semibold ${statusColors[property.status]}`}>
+                                        {property.status}
+                                    </span>
+                                    {property.status !== 'CANCELLED' && (
+                                        <button
+                                            onClick={() => handleCancelBooking(property.id)}
+                                            className="mt-4 bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors"
+                                        >
+                                            Cancel Booking
+                                        </button>
+                                    )}
+                                </div>
+                            </li>
+                        ))}
+
+                    </ul>
+                )}
             </section>
 
-            <section style={{ marginBottom: '30px' }}>
-                <h3 style={{ fontSize: '1.5rem', borderBottom: '2px solid #ccc', paddingBottom: '5px', marginBottom: '15px' }}>
-                    Booking Requests
-                </h3>
+            <section className="mb-8">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-4">Booking Requests</h3>
                 <BookingRequests />
             </section>
         </div>
     );
-};
-
-// Styling för kort
-const cardStyle = {
-    border: '1px solid #ddd',
-    padding: '15px',
-    borderRadius: '8px',
-    marginBottom: '15px',
-    backgroundColor: '#f9f9f9',
-};
-
-// Styling för text inom kort
-const propertyTextStyle = {
-    fontSize: '1rem',
-    marginBottom: '8px',
-};
-
-// Färgkarta för status
-const statusColors = {
-    PENDING: '#ff9800',  // Orange
-    APPROVED: '#4caf50', // Grön
-    DECLINED: '#f44336'  // Röd
 };
 
 export default Bookings;

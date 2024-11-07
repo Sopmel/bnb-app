@@ -11,6 +11,16 @@ type BookingRequest = {
     user: { id: string; name: string };
 };
 
+type NotificationType = 'BOOKING_REQUEST' | 'MESSAGE' | 'APPROVED' | 'DECLINED';
+
+type Notification = {
+    id: string;
+    userId: string;
+    message: string;
+    type: NotificationType;
+    createdAt: Date;
+};
+
 const BookingRequests = () => {
     const [requests, setRequests] = useState<BookingRequest[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -41,12 +51,12 @@ const BookingRequests = () => {
         fetchRequests();
     }, []);
 
-    const createNotification = async (userId: string, message: string) => {
+    const createNotification = async (userId: string, message: string, type: NotificationType, bookingId?: string, messageId?: string) => {
         try {
             const token = getLocalStorageItem("token");
             if (!token) return;
 
-            await axios.post('/api/notifications', { userId, message }, {
+            await axios.post('/api/notifications', { userId, message, type, bookingId, messageId }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
         } catch (error) {
@@ -67,7 +77,12 @@ const BookingRequests = () => {
             setRequests(requests.map(req => req.id === bookingId ? { ...req, status: 'APPROVED' } : req));
             const booking = requests.find(req => req.id === bookingId);
             if (booking) {
-                await createNotification(booking.user.id, `Your booking for ${booking.totalPrice} SEK has been approved.`);
+                await createNotification(
+                    booking.user.id,
+                    `Your booking for ${booking.totalPrice} SEK has been approved.`,
+                    "APPROVED",
+                    bookingId
+                );
             }
         } catch (error) {
             setError("Error approving booking");
@@ -88,7 +103,11 @@ const BookingRequests = () => {
             setRequests(requests.map(req => req.id === bookingId ? { ...req, status: 'DECLINED' } : req));
             const booking = requests.find(req => req.id === bookingId);
             if (booking) {
-                await createNotification(booking.user.id, `Your booking request for ${booking.totalPrice} SEK was declined.`);
+                await createNotification(booking.user.id,
+                    `Your booking request for ${booking.totalPrice} SEK was declined.`,
+                    "DECLINED",
+                    bookingId)
+                    ;
             }
         } catch (error) {
             setError("Error declining booking");

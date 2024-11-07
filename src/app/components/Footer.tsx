@@ -33,7 +33,6 @@ export default function Footer() {
                     </ul>
                 </div>
 
-
                 <div>
                     <h2 className="text-lg font-semibold mb-4">Följ Oss</h2>
                     <div className="flex space-x-4 text-2xl">

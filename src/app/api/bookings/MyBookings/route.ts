@@ -23,7 +23,28 @@ export async function GET(req: NextRequest) {
                 status: "APPROVED",
             },
             include: {
-                property: true,
+                property: {
+                    select: {
+                        name: true,
+                        location: true,
+                        imageUrl: true,
+                        pricePerNight: true,
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                email: true
+                            }
+                        }
+                    }
+                },
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
             }
         });
 
