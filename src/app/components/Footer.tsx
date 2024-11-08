@@ -19,16 +19,16 @@ export default function Footer() {
                     <h2 className="text-lg font-semibold mb-4">Snabblänkar</h2>
                     <ul className="space-y-2">
                         <li>
-                            <Link href="/about" className="hover:underline hover:text-gray-100">Om Oss</Link>
+                            <Link href="#" className="hover:underline hover:text-gray-100">About</Link>
                         </li>
                         <li>
-                            <Link href="/contact" className="hover:underline hover:text-gray-100">Kontakt</Link>
+                            <Link href="#" className="hover:underline hover:text-gray-100">Contact</Link>
                         </li>
                         <li>
-                            <Link href="/privacy" className="hover:underline hover:text-gray-100">Integritetspolicy</Link>
+                            <Link href="#" className="hover:underline hover:text-gray-100">Policy</Link>
                         </li>
                         <li>
-                            <Link href="/terms" className="hover:underline hover:text-gray-100">Användarvillkor</Link>
+                            <Link href="#" className="hover:underline hover:text-gray-100">Terms</Link>
                         </li>
                     </ul>
                 </div>
@@ -36,16 +36,16 @@ export default function Footer() {
                 <div>
                     <h2 className="text-lg font-semibold mb-4">Följ Oss</h2>
                     <div className="flex space-x-4 text-2xl">
-                        <Link href="https://facebook.com" target="_blank" className="hover:text-blue-500">
+                        <Link href="#" target="_blank" className="hover:text-blue-500">
                             <FaFacebook />
                         </Link>
-                        <Link href="https://instagram.com" target="_blank" className="hover:text-pink-500">
+                        <Link href="#" target="_blank" className="hover:text-pink-500">
                             <FaInstagram />
                         </Link>
-                        <Link href="https://twitter.com" target="_blank" className="hover:text-blue-400">
+                        <Link href="#" target="_blank" className="hover:text-blue-400">
                             <FaTwitter />
                         </Link>
-                        <Link href="https://linkedin.com" target="_blank" className="hover:text-blue-700">
+                        <Link href="#" target="_blank" className="hover:text-blue-700">
                             <FaLinkedin />
                         </Link>
                     </div>
