@@ -42,7 +42,8 @@ const AdminPage = () => {
                 });
 
                 setUsers(response.data);
-                setFilteredUsers(response.data); // Visa alla användare som standard
+                setFilteredUsers(response.data);
+                console.log("Fetched users:", users);
             } catch (err) {
                 console.error("Misslyckades med att hämta användare", err);
                 setError("Misslyckades med att hämta användare");
