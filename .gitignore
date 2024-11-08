@@ -1,5 +1,14 @@
+# Node modules
 node_modules
+
+# Environment variables
 .env
 
+# Next.js build output
+.next
+
+# Prisma migrations (om du använder Prisma)
+prisma/migrations
+
+# Vercel build output
 .vercel
-.next/
